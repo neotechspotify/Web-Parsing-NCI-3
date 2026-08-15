@@ -173,8 +173,32 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
   const [githubToken, setGithubToken] = useState<string>(() => localStorage.getItem('github_pat') || '');
   const [githubRepo, setGithubRepo] = useState<string>(() => localStorage.getItem('github_repo') || 'neotechspotify/Web-Parsing-NCI');
   const [githubBranch, setGithubBranch] = useState<string>(() => localStorage.getItem('github_branch') || 'main');
-  const [githubFilePath, setGithubFilePath] = useState<string>(() => localStorage.getItem('github_filepath') || 'database/medika/blacklists/List-IP-Blacklist.txt');
   const [githubAutoSync, setGithubAutoSync] = useState<boolean>(() => localStorage.getItem('github_autosync') === 'true');
+  const [customGithubPaths, setCustomGithubPaths] = useState<Record<string, string>>(() => {
+    try {
+      const raw = localStorage.getItem('github_custom_paths');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Helper to dynamically get target path in GitHub for any instansi + filename
+  const getEffectiveGithubPath = (inst: string = selectedInstansi, file: string = selectedFilename): string => {
+    const key = `${inst.toLowerCase()}/${file.toLowerCase()}`;
+    if (customGithubPaths[key] && customGithubPaths[key].trim()) {
+      return customGithubPaths[key].trim();
+    }
+    return `database/${inst.toLowerCase()}/blacklists/${file}`;
+  };
+
+  const [currentModalFilePath, setCurrentModalFilePath] = useState<string>('');
+
+  // Keep modal input in sync when selected file or instansi changes or modal opens
+  useEffect(() => {
+    setCurrentModalFilePath(getEffectiveGithubPath(selectedInstansi, selectedFilename));
+  }, [selectedInstansi, selectedFilename, showGithubModal, customGithubPaths]);
+
   const [githubSyncStatus, setGithubSyncStatus] = useState<{ loading: boolean; type: 'success' | 'error' | null; message: string; lastSyncTime?: string }>({
     loading: false,
     type: null,
@@ -190,7 +214,6 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
         const localPat = localStorage.getItem('github_pat') || '';
         const localRepo = localStorage.getItem('github_repo') || '';
         const localBranch = localStorage.getItem('github_branch') || '';
-        const localPath = localStorage.getItem('github_filepath') || '';
 
         if (data && data.success && data.config) {
           const cfg = data.config;
@@ -221,13 +244,6 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
           const finalBranch = cfg.githubBranch || localBranch || 'main';
           setGithubBranch(finalBranch);
           localStorage.setItem('github_branch', finalBranch);
-
-          // 4. File path logic
-          const finalPath = cfg.githubFilePath || localPath;
-          if (finalPath) {
-            setGithubFilePath(finalPath);
-            localStorage.setItem('github_filepath', finalPath);
-          }
 
           if (cfg.githubAutoSync !== undefined) {
             setGithubAutoSync(cfg.githubAutoSync);
@@ -291,13 +307,23 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
     setGithubToken(pat);
     setGithubRepo(repo);
     setGithubBranch(branch);
-    setGithubFilePath(path);
     setGithubAutoSync(autoSync);
+
+    const defaultPath = `database/${selectedInstansi.toLowerCase()}/blacklists/${selectedFilename}`;
+    const updatedCustomPaths = { ...customGithubPaths };
+    const currentKey = `${selectedInstansi.toLowerCase()}/${selectedFilename.toLowerCase()}`;
+
+    if (path && path.trim() && path.trim() !== defaultPath) {
+      updatedCustomPaths[currentKey] = path.trim();
+    } else {
+      delete updatedCustomPaths[currentKey];
+    }
+    setCustomGithubPaths(updatedCustomPaths);
 
     localStorage.setItem('github_pat', pat);
     localStorage.setItem('github_repo', repo);
     localStorage.setItem('github_branch', branch);
-    localStorage.setItem('github_filepath', path);
+    localStorage.setItem('github_custom_paths', JSON.stringify(updatedCustomPaths));
     localStorage.setItem('github_autosync', autoSync ? 'true' : 'false');
 
     try {
@@ -308,7 +334,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
           githubToken: pat,
           githubRepo: repo,
           githubBranch: branch,
-          githubFilePath: path,
+          githubFilePath: path || defaultPath,
           githubAutoSync: autoSync
         })
       });
@@ -330,9 +356,9 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
     const contentToPush = customContent !== undefined ? customContent : fileContent;
     const cleanRepo = repoRaw.replace('https://github.com/', '').replace('.git', '').trim();
     const targetBranch = githubBranch.trim() || 'main';
-    const targetPath = githubFilePath.trim() || `database/${selectedInstansi}/blacklists/${selectedFilename}`;
+    const targetPath = getEffectiveGithubPath(selectedInstansi, selectedFilename);
 
-    setGithubSyncStatus({ loading: true, type: null, message: `Committing to GitHub...` });
+    setGithubSyncStatus({ loading: true, type: null, message: `Committing ${targetPath} to GitHub...` });
 
     try {
       // 1. Get existing file SHA if present on branch
@@ -359,7 +385,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
 
       // 3. Commit/Push file via PUT request
       const activeCount = contentToPush.split('\n').filter(l => l.trim() && !l.startsWith('#')).length;
-      const commitMsg = customMsg || `feat(repo): update ${selectedFilename} via Web UI [${activeCount} active entries]`;
+      const commitMsg = customMsg || `feat(repo): update ${targetPath} via Web UI [${activeCount} active entries]`;
 
       const putRes = await fetch(`https://api.github.com/repos/${cleanRepo}/contents/${targetPath}`, {
         method: 'PUT',
@@ -383,7 +409,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
         setGithubSyncStatus({
           loading: false,
           type: 'success',
-          message: `Successfully pushed commit to GitHub at ${nowStr}!`,
+          message: `Successfully pushed ${targetPath} to GitHub at ${nowStr}!`,
           lastSyncTime: nowStr
         });
         return true;
@@ -420,9 +446,9 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
 
     const cleanRepo = repoRaw.replace('https://github.com/', '').replace('.git', '').trim();
     const targetBranch = githubBranch.trim() || 'main';
-    const targetPath = githubFilePath.trim() || `database/${selectedInstansi}/blacklists/${selectedFilename}`;
+    const targetPath = getEffectiveGithubPath(selectedInstansi, selectedFilename);
 
-    setGithubSyncStatus({ loading: true, type: null, message: `Pulling from GitHub...` });
+    setGithubSyncStatus({ loading: true, type: null, message: `Pulling ${targetPath} from GitHub...` });
 
     try {
       const getRes = await fetch(`https://api.github.com/repos/${cleanRepo}/contents/${targetPath}?ref=${targetBranch}`, {
@@ -2061,21 +2087,60 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                 </div>
 
                 {/* File Path */}
-                <div className="space-y-1.5">
-                  <label className="font-semibold text-slate-300">
-                    File Path in GitHub Repo:
-                  </label>
+                <div className="space-y-2 bg-slate-950/80 p-3.5 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-xs text-slate-200 flex items-center gap-1.5">
+                      <FileCode className="h-4 w-4 text-indigo-400" />
+                      Target Path for <span className="text-emerald-400 font-mono uppercase font-bold">{selectedInstansi}</span> ({selectedFilename}):
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const defaultPath = `database/${selectedInstansi.toLowerCase()}/blacklists/${selectedFilename}`;
+                        setCurrentModalFilePath(defaultPath);
+                        const updated = { ...customGithubPaths };
+                        delete updated[`${selectedInstansi.toLowerCase()}/${selectedFilename.toLowerCase()}`];
+                        setCustomGithubPaths(updated);
+                        localStorage.setItem('github_custom_paths', JSON.stringify(updated));
+                      }}
+                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium underline cursor-pointer"
+                    >
+                      Reset Default Path
+                    </button>
+                  </div>
                   <input
                     id="input-github-filepath"
                     type="text"
-                    value={githubFilePath}
-                    onChange={(e) => setGithubFilePath(e.target.value)}
-                    placeholder="database/medika/blacklists/List-IP-Blacklist.txt"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                    value={currentModalFilePath}
+                    onChange={(e) => setCurrentModalFilePath(e.target.value)}
+                    placeholder={`database/${selectedInstansi.toLowerCase()}/blacklists/${selectedFilename}`}
+                    className="w-full bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500 font-semibold"
                   />
-                  <p className="text-[11px] text-slate-500">
-                    Path where <span className="text-indigo-300 font-mono">{selectedFilename}</span> will be committed in your repository.
-                  </p>
+                  
+                  {/* Multi-Instansi Auto Mapping Grid */}
+                  <div className="pt-2 border-t border-slate-800/80 mt-1">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                      Auto-Mapped Path Per Instansi:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 font-mono text-[11px]">
+                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'medika' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
+                        <span className="font-bold">🏥 MEDIKA:</span>
+                        <span className="truncate ml-2 text-[10px] text-slate-300">database/medika/blacklists/List-IP-Blacklist.txt</span>
+                      </div>
+                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'aal' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
+                        <span className="font-bold">🛡️ AAL:</span>
+                        <span className="truncate ml-2 text-[10px] text-slate-300">database/aal/blacklists/List-Domain-Blacklist.txt</span>
+                      </div>
+                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'kemkes' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
+                        <span className="font-bold">🏛️ KEMKES:</span>
+                        <span className="truncate ml-2 text-[10px] text-slate-300">database/kemkes/blacklists/List-IP-Blacklist.txt</span>
+                      </div>
+                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'kemtan' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
+                        <span className="font-bold">🌾 KEMTAN:</span>
+                        <span className="truncate ml-2 text-[10px] text-slate-300">database/kemtan/blacklists/List-IP-Blacklist.txt</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Auto-Commit Toggle */}
@@ -2131,7 +2196,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                 <button
                   id="btn-save-github-config"
                   onClick={() => {
-                    saveGithubSettings(githubToken, githubRepo, githubBranch, githubFilePath, githubAutoSync);
+                    saveGithubSettings(githubToken, githubRepo, githubBranch, currentModalFilePath, githubAutoSync);
                     setShowGithubModal(false);
                   }}
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow"
