@@ -37,7 +37,7 @@ import {
   AlertCircle,
   Image as ImageIcon
 } from 'lucide-react';
-import companyLogo from './assets/images/nci_cybersecurity_logo_1783342752877.jpg';
+import companyLogo from './assets/images/nci_shield_white_bg_1783343904191.jpg'; 
 import { LogEvent, ProcessResult } from './types';
 import AalPivotVisualizer from './components/AalPivotVisualizer';
 import { MedikaPivotVisualizer } from './components/MedikaPivotVisualizer';
