@@ -1,0 +1,60 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola lalu lintas yang sesuai dengan SIPVicious, yaitu sekumpulan tool yang umum digunakan untuk melakukan enumerasi, pemindaian, dan pengujian keamanan terhadap layanan SIP/VoIP. Tool ini dapat digunakan untuk mengidentifikasi extension SIP yang aktif, akun yang valid, maupun konfigurasi layanan yang rentan, dan sering dimanfaatkan sebagai tahap awal sebelum dilakukan serangan brute force, penyalahgunaan layanan VoIP, atau eksploitasi lainnya.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan adanya aktivitas scanning terhadap layanan SIP dan belum terdapat bukti bahwa autentikasi berhasil dilakukan atau layanan berhasil dieksploitasi. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap log SIP server atau IP-PBX untuk memastikan apakah aktivitas tersebut hanya berupa proses enumerasi atau telah berkembang menjadi upaya serangan lanjutan.
+
+===============================
+
+Mitigasi :<br>
+-Tinjau log SIP server atau IP-PBX pada {dst_ip} untuk mengidentifikasi request yang berasal dari {src_ip}.
+- Verifikasi apakah terdapat aktivitas enumerasi extension, percobaan registrasi (REGISTER), autentikasi gagal, maupun panggilan yang tidak sah pada waktu kejadian.
+- Pastikan layanan SIP hanya dapat diakses dari alamat IP atau jaringan yang memiliki kebutuhan operasional apabila memungkinkan.
+- Terapkan Access Control List (ACL), rate limiting, serta fitur SIP flood protection atau proteksi brute force pada Session Border Controller (SBC), firewall, maupun IP-PBX.
+- Pastikan seluruh akun SIP menggunakan kata sandi yang kuat serta aktifkan mekanisme pengamanan tambahan apabila didukung oleh platform VoIP.
+- Pertimbangkan untuk memblokir alamat IP 208.87.243.141 pada firewall atau IPS apabila aktivitas serupa terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan monitoring terhadap aktivitas SIP serupa maupun indikasi serangan lanjutan pada layanan VoIP.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

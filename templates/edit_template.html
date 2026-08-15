@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}✏️ Edit Template - {{ template_name }}{% endblock %}
+
+{% block content %}
+<main class="container mx-auto px-6 py-10">
+  <div class="glass bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8">
+    <h2 class="text-2xl font-semibold text-yellow-300 mb-4 flex items-center gap-2">
+      ✏️ Edit Template — {{ template_name }}
+    </h2>
+    <p class="text-sm text-gray-400 mb-6">Instansi: <span class="text-blue-300">{{ instansi|upper }}</span></p>
+
+    <form method="POST">
+      <textarea name="template_content" rows="25"
+        class="w-full bg-gray-900 border border-gray-700 rounded-lg p-4 text-gray-100 font-mono text-sm leading-relaxed">{{ content }}</textarea>
+
+      <div class="mt-6 flex gap-4">
+        <button type="submit"
+          class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+          💾 Simpan Perubahan
+        </button>
+
+        <a href="{{ url_for('preview_event_template', instansi=instansi, template_name=template_name) }}"
+           class="bg-gray-700 hover:bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+          🔙 Kembali
+        </a>
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}

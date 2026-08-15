@@ -1,0 +1,17 @@
+Selamat Pagi Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring/pivot data Botnet AAL pada Shift 3,
+dimana terdeteksi aktivitas botnet domain sebagai berikut :
+
+*IP: 10.23.0.230* (Total: 2 deteksi)
+ - 5isohu.com (1 event)
+ - amnsreiuojy.ru (1 event)
+
+*IP: 10.23.0.243* (Total: 1 deteksi)
+ - 5isohu.com (1 event)
+
+Total Keseluruhan Event Botnet: 3 event
+
+Demikian atas informasinya.
+Terimakasih,
+SOC Neotech

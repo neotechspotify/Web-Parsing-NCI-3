@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola komunikasi HTTP yang mengandung teknik HTTP evasion, yaitu metode yang digunakan untuk menyamarkan atau memodifikasi request HTTP agar dapat menghindari proses inspeksi oleh perangkat keamanan seperti IDS, IPS, maupun WAF.
+
+Teknik HTTP evasion dapat berupa penggunaan karakter khusus, encoding yang tidak lazim, manipulasi header HTTP, maupun format request yang tidak sesuai standar. Teknik tersebut sering digunakan dalam upaya eksploitasi aplikasi web, komunikasi malware, maupun untuk melewati mekanisme deteksi keamanan. Namun, pada beberapa kondisi, alert ini juga dapat dipicu oleh implementasi aplikasi atau layanan tertentu yang menggunakan format komunikasi HTTP yang tidak umum.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya pola komunikasi yang menyerupai teknik HTTP evasion dan belum terdapat bukti bahwa aktivitas tersebut merupakan serangan yang berhasil atau mengakibatkan kompromi pada sistem. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap endpoint sumber, aplikasi yang melakukan koneksi, serta tujuan komunikasi untuk memastikan apakah aktivitas tersebut bersifat sah atau berpotensi berbahaya.
+
+===============================
+
+Mitigasi :<br>
+-Identifikasi aplikasi atau proses pada host {dst_ip} yang melakukan koneksi ke {src_ip} melalui TCP/9112.
+- Tinjau log proxy, firewall, atau endpoint untuk memperoleh URI, header HTTP, maupun payload yang memicu alert.
+- Verifikasi reputasi alamat IP tujuan dan pastikan komunikasi tersebut merupakan kebutuhan operasional yang sah.
+- Lakukan pemeriksaan pada endpoint menggunakan EDR atau antivirus untuk memastikan tidak terdapat malware atau proses mencurigakan yang memanfaatkan teknik HTTP evasion.
+- Pastikan sistem operasi, browser, dan aplikasi yang digunakan telah diperbarui dengan patch keamanan terbaru.
+- Apabila komunikasi dipastikan tidak sah atau berkaitan dengan aktivitas berbahaya, lakukan pemblokiran terhadap alamat IP tujuan melalui firewall atau web filtering sesuai kebijakan keamanan.
+- Lakukan monitoring terhadap komunikasi serupa maupun indikator kompromi (IOC) lainnya pada endpoint terkait.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

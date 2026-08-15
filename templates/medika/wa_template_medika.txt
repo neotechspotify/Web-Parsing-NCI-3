@@ -1,0 +1,15 @@
+[SUMMARY]
+
+{salam} Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring pada tanggal {tanggal} {jam}, dimana pada SIEM mendeteksi adanya event sebagai berikut :
+
+A. Alert :
+{alerts}
+
+B. Destination IP & Port Detected:
+{destination_ip_ports}
+
+Terimakasih, 
+SOC Neotech
+

@@ -1,0 +1,19 @@
+{salam} Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring pada tanggal {tanggal_range},
+dimana pada Sophos XDR Platform mendeteksi adanya event sebagai berikut :
+
+A. Critical :
+{critical}
+
+B. High :
+{high}
+
+C. Medium :
+{medium}
+
+D. Low :
+{low}
+
+Terimakasih,
+SOC Neotech

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}📈 Daftar Template Event - WebApp SOC{% endblock %}
+
+{% block content %}
+<main class="container mx-auto px-6 py-10">
+  <div class="glass bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8">
+    <h1 class="text-3xl font-semibold text-blue-300 mb-6 flex items-center gap-2">
+      📈 Daftar Event Template per Instansi
+    </h1>
+
+    <!-- Search -->
+    <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+        <input id="searchInput" type="text"
+                class="bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm text-white w-full md:w-1/2"
+                placeholder="🔍 Cari nama event...">
+
+        <div class="flex gap-4 items-center">
+            <span class="text-gray-400 text-sm">
+            Total: <span id="totalCount">{{ total_count }}</span> event
+            </span>
+
+            <!-- Tombol Buat Template Baru -->
+            <a href="{{ url_for('buat_template') }}"
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150">
+            ✏️ Buat Template Baru
+            </a>
+        </div>
+    </div>
+
+    {% for instansi, events in daftar_event.items() %}
+    <div class="mb-10">
+      <h2 class="text-xl font-semibold text-green-300 mb-3">
+        🏢 {{ instansi|upper }} <span class="text-gray-400 text-sm">({{ events|length }} event)</span>
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left bg-gray-900 border border-gray-700 rounded-lg">
+          <thead class="bg-gray-800 text-gray-300 text-sm uppercase">
+            <tr>
+              <th class="p-3 w-16">#</th>
+              <th class="p-3">Nama Template</th>
+              <th class="p-3">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for e in events %}
+            <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+              <td class="p-3 text-gray-400 text-sm">{{ loop.index }}</td>
+              <td class="p-3 font-medium text-gray-200">{{ e }}</td>
+              <td class="p-3 flex gap-2">
+                <!-- Lihat -->
+                <a href="{{ url_for('preview_event_template', instansi=instansi, template_name=e) }}"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm shadow-md transition duration-150 flex items-center gap-1">
+                    🔍 Lihat
+                </a>
+
+                <!-- Edit -->
+                <a href="{{ url_for('edit_event_template', instansi=instansi, template_name=e) }}"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg text-sm shadow-md transition duration-150 flex items-center gap-1">
+                    ✏️ Edit
+                </a>
+
+                    <!-- Tombol Delete -->
+                    <button type="button" onclick="openDeleteModal('{{ instansi }}','{{ e }}', {{ loop.index }})"
+                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm shadow-md flex items-center gap-1">
+                    🗑️ Delete
+                    </button>
+
+                    <!-- Modal -->
+                    <div id="deleteModal-{{ loop.index }}" class="fixed inset-0 hidden items-center justify-center z-50">
+                    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+
+                    <div id="deleteModalBox-{{ loop.index }}" class="bg-gray-900 text-gray-100 rounded-xl shadow-2xl w-96 max-w-full mx-4 p-6 z-50 transform scale-90 opacity-0 transition-all duration-200">
+                        <h2 class="text-xl font-bold mb-4">Konfirmasi Hapus</h2>
+                        <p class="mb-6">Apakah Anda yakin ingin menghapus template <span id="modalTemplateName-{{ loop.index }}" class="font-semibold"></span>?</p>
+                        <div class="flex justify-end gap-3">
+                            <button onclick="closeDeleteModal({{ loop.index }})" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg">Batal</button>
+                            <form id="deleteForm-{{ loop.index }}" method="POST" action="{{ url_for('delete_event_template', instansi=instansi, template_name=e) }}">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Hapus</button>
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</main>
+
+<script>
+document.getElementById("searchInput").addEventListener("keyup", function() {
+  const filter = this.value.toLowerCase();
+  let count = 0;
+  document.querySelectorAll("tbody tr").forEach(row => {
+    const text = row.innerText.toLowerCase();
+    const match = text.includes(filter);
+    row.style.display = match ? "" : "none";
+    if (match) count++;
+  });
+  document.getElementById("totalCount").innerText = count;
+});
+
+function openDeleteModal(instansi, templateName, idx) {
+  const modal = document.getElementById(`deleteModal-${idx}`);
+  const modalBox = document.getElementById(`deleteModalBox-${idx}`);
+  const templateSpan = document.getElementById(`modalTemplateName-${idx}`);
+  const deleteForm = document.getElementById(`deleteForm-${idx}`);
+
+  templateSpan.innerText = templateName;
+  deleteForm.action = `/delete_event_template/${instansi}/${templateName}`;
+
+  modal.classList.remove('hidden');
+
+  setTimeout(() => {
+    modalBox.classList.remove('scale-90','opacity-0');
+    modalBox.classList.add('scale-100','opacity-100');
+  }, 10);
+}
+
+function closeDeleteModal(idx) {
+  const modal = document.getElementById(`deleteModal-${idx}`);
+  const modalBox = document.getElementById(`deleteModalBox-${idx}`);
+
+  modalBox.classList.remove('scale-100','opacity-100');
+  modalBox.classList.add('scale-90','opacity-0');
+
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 200);
+}
+
+// Tutup modal saat klik overlay
+document.querySelectorAll('[id^=deleteModal-]').forEach(modal => {
+  modal.addEventListener('click', function(e){
+    if(e.target === this) {
+      const idx = this.id.split('-')[1];
+      closeDeleteModal(idx);
+    }
+  });
+});
+
+</script>
+{% endblock %}

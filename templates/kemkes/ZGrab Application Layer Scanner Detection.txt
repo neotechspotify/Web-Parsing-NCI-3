@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola komunikasi yang sesuai dengan ZGrab Application Layer Scanner. ZGrab merupakan tool open source yang umum digunakan untuk melakukan banner grabbing, enumerasi layanan, dan pengumpulan informasi terhadap berbagai protokol jaringan, termasuk HTTP, HTTPS, SSH, SMTP, dan IPP.
+
+Pada kasus ini, pemindaian ditujukan ke layanan IPP ({dst_port}) yang umumnya digunakan oleh printer jaringan atau print server. Aktivitas ini dapat bertujuan untuk mengidentifikasi jenis perangkat, versi layanan, konfigurasi, maupun mencari perangkat yang memiliki kerentanan sehingga dapat menjadi target eksploitasi lanjutan.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan adanya aktivitas reconnaissance (scanning) dan belum terdapat bukti bahwa layanan IPP berhasil dieksploitasi atau terjadi kompromi terhadap sistem. Namun demikian, keberadaan layanan IPP yang dapat diakses dari internet perlu dievaluasi karena dapat meningkatkan risiko keamanan apabila tidak memang diperlukan.
+
+===============================
+
+Mitigasi :<br>
+- Tinjau log pada host {dst_ip} untuk mengidentifikasi aktivitas yang berasal dari {src_ip} pada waktu kejadian.
+- Verifikasi apakah layanan IPP (TCP/{dst_port}) memang diperlukan untuk diakses dari internet. Jika tidak, batasi atau tutup akses dari jaringan publik melalui firewall.
+- Pastikan printer jaringan atau print server menggunakan firmware terbaru serta telah memperoleh pembaruan keamanan dari vendor.
+- Terapkan Access Control List (ACL) atau pembatasan berdasarkan alamat IP agar layanan IPP hanya dapat diakses oleh jaringan atau pengguna yang memiliki kebutuhan operasional.
+- Nonaktifkan layanan IPP apabila sudah tidak digunakan atau tidak diperlukan.
+- Pertimbangkan untuk memblokir alamat IP {src_ip} pada firewall atau IPS apabila aktivitas scanning terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan monitoring terhadap aktivitas scanning serupa maupun upaya enumerasi lanjutan terhadap layanan yang terekspos ke internet.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

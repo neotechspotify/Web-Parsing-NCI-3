@@ -1,0 +1,64 @@
+Dear Team MEDIKA,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+
+Tim SOC mendeteksi adanya koneksi anomaly pada 
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP :
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+Payload :
+
+TCP SYN Packet
+
+Source Port      : 40048
+Destination Port : 993 (IMAPS)
+TCP Flags        : SYN
+
+===============================
+
+Analisis Event :
+
+Alert ini dipicu karena Suricata mendeteksi lebih dari 30 koneksi TCP SYN ke layanan IMAPS (port 993) dalam waktu 60 detik dari source IP yang sama. Pola tersebut sesuai dengan signature Rapid IMAPS Connections - Possible Brute Force Attack, yang umumnya mengindikasikan percobaan login berulang terhadap layanan email menggunakan metode brute force atau password spraying.
+
+Namun demikian, signature ini hanya mendeteksi frekuensi koneksi dan belum membuktikan adanya percobaan autentikasi yang berhasil maupun kegagalan login. Aktivitas serupa juga dapat berasal dari proses monitoring, health check, vulnerability scanner, atau aplikasi email yang melakukan reconnect secara berulang.
+
+Diperlukan korelasi dengan log mail server (Dovecot, Exchange, Zimbra, atau sejenisnya) untuk memastikan apakah benar terjadi percobaan brute force.
+
+===============================
+
+Mitigasi :
+- Periksa log autentikasi pada mail server untuk melihat adanya login gagal berulang dari IP {src_ip}.
+- Verifikasi apakah IP tersebut merupakan alamat yang dikenal atau termasuk layanan monitoring yang sah.
+- Terapkan rate limiting or account lockout apabila ditemukan percobaan login berulang.
+- Blokir source IP pada firewall apabila dipastikan merupakan aktivitas brute force.
+- Aktifkan Multi-Factor Authentication (MFA) untuk akun email yang dapat diakses dari internet.
+- Pastikan hanya host yang diperlukan yang dapat mengakses layanan IMAPS.
+
+===============================
+
+Terimakasih,
+SOC Neotech

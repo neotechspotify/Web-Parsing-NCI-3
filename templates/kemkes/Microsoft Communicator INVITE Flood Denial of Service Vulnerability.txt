@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi file JavaScript yang memiliki pola obfuscation atau evasion, yaitu teknik yang digunakan untuk menyamarkan kode JavaScript agar lebih sulit dianalisis maupun dideteksi oleh mekanisme keamanan.
+
+Teknik obfuscation tidak selalu menunjukkan adanya malware, karena beberapa aplikasi web, Content Delivery Network (CDN), atau layanan pihak ketiga menggunakan JavaScript yang telah diminifikasi atau diobfuscate untuk alasan optimasi maupun perlindungan kode. Namun, teknik yang sama juga sering digunakan oleh malware, exploit kit, maupun halaman phishing untuk menyembunyikan payload berbahaya dan menghindari deteksi.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan bahwa terdapat JavaScript dengan karakteristik mencurigakan yang dikirimkan kepada host internal. Belum terdapat bukti bahwa script tersebut bersifat berbahaya atau telah menyebabkan kompromi pada endpoint. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap sumber JavaScript serta aktivitas endpoint yang menerima konten tersebut.
+
+===============================
+
+Mitigasi :<br>
+- Identifikasi website atau domain yang mengirimkan file script.js kepada host {dst_ip} melalui web proxy, firewall log, atau browser history.
+- Verifikasi apakah domain tersebut merupakan layanan yang sah dan memang digunakan untuk kebutuhan operasional.
+- Lakukan analisis terhadap file JavaScript menggunakan sandbox, antivirus, atau layanan threat intelligence untuk memastikan apakah script mengandung kode berbahaya.
+- Periksa endpoint yang menerima konten tersebut menggunakan EDR/antivirus untuk memastikan tidak terdapat proses mencurigakan, malware, atau aktivitas lanjutan setelah file JavaScript diterima.
+- Pastikan browser, plugin, serta sistem operasi endpoint telah diperbarui dengan patch keamanan terbaru.
+- Apabila domain atau file JavaScript dipastikan berbahaya, lakukan pemblokiran melalui firewall, web filtering, DNS filtering, atau Secure Web Gateway sesuai kebijakan keamanan.
+- Lakukan monitoring terhadap komunikasi lanjutan ke domain terkait maupun indikator kompromi (IOC) lainnya.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

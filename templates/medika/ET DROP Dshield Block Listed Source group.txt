@@ -1,0 +1,52 @@
+Dear Team Medika,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+No Tiket : {ticket_id}
+Signature : {event_name}
+Sec. Event : {event_type}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya percobaan komunikasi anomali yang terjadi pada:
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination IP :
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+===============================
+
+Alamat IP sumber terdeteksi sebagai bagian dari DShield Block List, yaitu daftar alamat IP yang memiliki reputasi buruk berdasarkan laporan aktivitas 
+berbahaya yang dikumpulkan oleh DShield. Aktivitas tersebut dapat mencakup pemindaian (scanning), percobaan eksploitasi, brute force, maupun aktivitas mencurigakan lainnya.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan adanya komunikasi dari IP dengan reputasi buruk menuju layanan pada server internal. 
+Namun, alert ini tidak secara langsung membuktikan bahwa telah terjadi eksploitasi atau kompromi, sehingga diperlukan verifikasi lebih lanjut 
+terhadap aktivitas yang dilakukan oleh alamat IP tersebut.
+
+===============================
+
+Mitigasi :
+- Verifikasi apakah komunikasi dari alamat IP sumber merupakan aktivitas yang sah atau memiliki kebutuhan bisnis yang valid.
+- Lakukan pemeriksaan pada log firewall, mail server (IMAPS), dan sistem terkait untuk mengidentifikasi adanya aktivitas lanjutan dari alamat IP tersebut.
+- Blokir alamat IP sumber apabila tidak terdapat kebutuhan bisnis yang sah atau terindikasi melakukan aktivitas berbahaya.
+- Lakukan monitoring terhadap host tujuan untuk memastikan tidak terdapat percobaan eksploitasi, brute force, maupun aktivitas mencurigakan lainnya yang berasal dari alamat IP tersebut.
+
+===============================
+
+Terimakasih,
+SOC Neotech

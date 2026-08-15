@@ -1,0 +1,12 @@
+{salam} Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring pada tanggal {tanggal} {jam}, dimana pada XDR Platform mendeteksi adanya event sebagai berikut :
+
+A. Offenses :
+{offenses}
+
+B. Log Activity :
+{log_activity}
+
+Terimakasih,
+SOC Neotech

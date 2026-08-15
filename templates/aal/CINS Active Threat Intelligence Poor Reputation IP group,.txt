@@ -1,0 +1,50 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+Query :
+{query}
+
+URL/DNS :
+{url}
+
+===============================
+
+Event ini terjadi karena pada ip source tercatat pada CINS (Collective Intelligence Network Security) dimana pada daftar ip tersebut tercatat dengan reputasi buruk, ip - ip tersebut sering memanfaatkan kelemahan dalam sistem dapat berupa bug, glitch, atau kerentanan desain pada aplikasi.
+
+===============================
+
+- Periksa apakah ip yang mengakses terdaftar pada whitelist.
+- Lakukan Bloking jika ip public terdeteksi sebagai bad reputation.
+- Terapkan policy deny untuk IP dengan reputasi buruk (CINS)
+
+===============================
+
+Terimakasih,
+SOC Neotech

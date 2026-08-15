@@ -1,0 +1,93 @@
+Selamat Pagi,<br><br>
+Izin pak, untuk menginformasikan alert yang terdeteksi pada Sophos XDR Platform, berikut untuk detail alert yang perlu dilakukan pengecekan dan tindak lanjut :<br><br>
+Incident Details
+<table border="1" cellpadding="8" style="border-collapse: collapse; width: 650px; max-width: 100%; table-layout: fixed; font-family: 'Inter', system-ui, sans-serif; color: #1e293b; background-color: #ffffff; border-color: #cbd5e1; font-size: 13px; margin: 15px 0;">
+  <colgroup>
+    <col style="width: 150px;" />
+    <col style="width: 500px;" />
+  </colgroup>
+  <tr>
+    <td style="font-weight: 600; width: 150px; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Incident ID</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a; width: 500px;">{incident_id}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Title</td>
+    <td style="border: 1px solid #cbd5e1; font-weight: 600; color: #0284c7;">{event_name}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Time</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{seen}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Priority</td>
+    <td style="border: 1px solid #cbd5e1; font-weight: 600; color: #b45309;">{severity}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Account Name</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{username}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Computer Name</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{hostname}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">IP ADDRESS</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a; font-family: monospace;">{detection_ip}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Device Type</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{device_type}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Operating System</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{operating_system}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">File Name</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{file_name}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">File Path</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{file_path}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Command Line</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a; font-family: monospace; white-space: pre-wrap; word-break: break-all; word-wrap: break-word;">{command_line}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">IOC Value (SHA256)</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a; font-family: monospace; word-break: break-all; word-wrap: break-word;">{ioc_value}</td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; border: 1px solid #cbd5e1; background-color: #f8fafc; color: #334155;">Action</td>
+    <td style="border: 1px solid #cbd5e1; color: #0f172a;">{action}</td>
+  </tr>
+</table>
+
+<div style="font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.6; margin-top: 20px; max-width: 650px;">
+  <p style="margin: 12px 0;">
+    <strong>Description :</strong><br>
+    {deskripsi}
+  </p>
+
+  <p style="margin: 12px 0;">
+    <strong>Initial Analysis :</strong><br>
+    {analisa_awal}
+  </p>
+
+  <p style="margin: 12px 0;">
+    <strong>Reputation :</strong><br>
+    {reputasi}
+  </p>
+
+  <p style="margin: 12px 0;">
+    <strong>Recommendation :</strong><br>
+    {mitigasi}
+  </p>
+
+  <p style="margin: 20px 0 0 0;">
+    Demikian atas informasinya.<br>
+    Terimakasih,<br>
+    <strong>SOC Neotech</strong>
+  </p>
+</div>

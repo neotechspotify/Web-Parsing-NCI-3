@@ -1,0 +1,60 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena sistem keamanan mengkorelasikan beberapa alert yang memiliki Source IP yang sama, seperti aktivitas scanning, percobaan eksploitasi, probing terhadap aplikasi web, maupun aktivitas mencurigakan lainnya. Munculnya beberapa signature dari satu alamat IP umumnya menunjukkan adanya aktivitas reconnaissance atau upaya eksploitasi secara berulang terhadap layanan yang terekspos.
+
+Berdasarkan informasi yang tersedia, alert ini merupakan hasil korelasi dari beberapa event keamanan dan belum secara langsung menunjukkan bahwa eksploitasi berhasil dilakukan. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap seluruh alert yang berkaitan dengan Source IP tersebut untuk menentukan jenis serangan, target yang terdampak, serta potensi dampaknya terhadap sistem.
+
+===============================
+
+Mitigasi :<br>
+-Tinjau seluruh alert yang berkaitan dengan Source IP yang sama untuk mengidentifikasi jenis aktivitas yang dilakukan serta target yang diakses.
+- Periksa access log, application log, maupun log sistem pada host tujuan untuk memastikan apakah terdapat indikasi eksploitasi yang berhasil atau hanya sebatas percobaan.
+- Verifikasi apakah terdapat respons HTTP 200 OK, keberhasilan autentikasi, atau aktivitas abnormal lainnya yang mengindikasikan kompromi.
+- Identifikasi pola serangan, termasuk frekuensi request, URI yang diakses, payload yang dikirimkan, dan layanan yang menjadi target.
+- Apabila aktivitas dipastikan merupakan serangan yang tidak sah, lakukan pemblokiran terhadap alamat IP sumber melalui Firewall, IPS, WAF, atau mekanisme keamanan lainnya sesuai kebijakan yang berlaku.
+- Pastikan seluruh sistem yang menjadi target telah diperbarui dengan patch keamanan terbaru dan tidak mengekspos layanan atau file yang tidak diperlukan.
+- Lakukan monitoring terhadap aktivitas lanjutan dari Source IP yang sama maupun indikator kompromi (IOC) lainnya.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola request yang sesuai dengan Nmap Scripting Engine (NSE). NSE merupakan fitur pada Nmap yang memungkinkan pelaksanaan berbagai script untuk melakukan enumerasi layanan, identifikasi kerentanan, pengambilan informasi, maupun pengujian eksploitasi terhadap target.
+
+Berdasarkan log, request mengarah ke resource Trinity.txt.bak, yang mengindikasikan adanya upaya mencari file cadangan (backup file) yang mungkin masih dapat diakses. File dengan ekstensi .bak sering kali menjadi target karena berpotensi berisi source code, konfigurasi, maupun informasi sensitif yang tidak seharusnya dipublikasikan.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan adanya aktivitas scanning atau enumerasi dan belum terdapat bukti bahwa file berhasil diakses ataupun terjadi eksploitasi terhadap sistem. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap access log dan respons layanan untuk memastikan dampak dari aktivitas tersebut.
+
+===============================
+
+Mitigasi :<br>
+- Tinjau access log dan application log pada server untuk mengidentifikasi request menuju Trinity.txt.bak pada waktu kejadian.
+- Verifikasi respons HTTP yang diberikan oleh layanan (misalnya 200 OK, 403 Forbidden, atau 404 Not Found) untuk memastikan apakah file berhasil diakses.
+- Pastikan file backup seperti .bak, .old, .zip, .tar, atau file sementara lainnya tidak berada pada direktori yang dapat diakses dari internet.
+- Lakukan inventarisasi terhadap file yang dipublikasikan pada web server dan hapus file backup atau artefak pengembangan yang tidak diperlukan.
+- Pastikan aplikasi dan layanan yang berjalan telah diperbarui dengan patch keamanan terbaru untuk mengurangi risiko eksploitasi lanjutan.
+- Pertimbangkan untuk memblokir alamat IP pada firewall, IPS, atau WAF apabila aktivitas scanning terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan monitoring terhadap aktivitas serupa maupun indikasi reconnaissance atau eksploitasi lanjutan pada server.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

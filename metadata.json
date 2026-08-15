@@ -1,0 +1,8 @@
+{
+  "name": "Log Parsing and Report Generator",
+  "description": "Parses security logs and XML files, fills event response templates, and generates WhatsApp summary reports and Excel spreadsheets for shift handover.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

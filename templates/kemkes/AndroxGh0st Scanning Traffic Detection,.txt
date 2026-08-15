@@ -1,0 +1,60 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Action : Closed<br>
+Log Source : PA-KEMKES<br>
+Magnitude : {sev_magnitude}<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada<br>
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP :<br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola request HTTP yang sesuai dengan aktivitas scanning AndroxGh0st, yaitu malware/botnet yang umum digunakan untuk mencari file konfigurasi .env pada aplikasi web, khususnya aplikasi berbasis Laravel.
+
+File .env umumnya berisi informasi sensitif seperti kredensial database, API key, secret key aplikasi, serta kredensial layanan cloud. Apabila file tersebut dapat diakses melalui HTTP, informasi tersebut berpotensi disalahgunakan untuk memperoleh akses tidak sah ke aplikasi maupun layanan terkait.
+
+Berdasarkan log yang tersedia, belum terdapat bukti bahwa file .env berhasil diakses atau terjadi kebocoran informasi. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap log web server untuk memastikan apakah permintaan tersebut hanya merupakan percobaan scanning atau memperoleh respons yang mengindikasikan keberhasilan akses (misalnya HTTP 200 OK).
+
+===============================
+
+Mitigasi :<br>
+- Tinjau access log dan error log web server pada {dst_ip} untuk mengidentifikasi request menuju file .env atau variasinya (misalnya /.env, /.env.backup, /.env.local, dan sejenisnya) yang berasal dari {src_ip}.
+- Pastikan file .env tidak dapat diakses melalui HTTP dan berada di luar document root atau dibatasi melalui konfigurasi web server.
+- Apabila ditemukan respons HTTP 200 OK terhadap permintaan tersebut, lakukan rotasi seluruh kredensial yang tersimpan pada file .env, termasuk kredensial database, API key, SMTP, serta secret aplikasi.
+- Pastikan aplikasi web dan framework yang digunakan telah diperbarui ke versi yang didukung serta tidak memiliki kerentanan yang diketahui.
+- Pertimbangkan untuk memblokir alamat IP {src_ip} pada firewall, IPS, atau External Dynamic List (EDL) apabila aktivitas scanning berulang dan dipastikan bukan merupakan akses yang sah.
+- Lakukan monitoring terhadap aktivitas serupa maupun indikasi eksploitasi lanjutan pada web server.
+===============================
+
+Terimakasih,<br>
+SOC Neotech

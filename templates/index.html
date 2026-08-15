@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | WebApp SOC{% endblock %}
+
+{% block content %}
+<div class="glass p-8 rounded-2xl shadow-xl">
+  <h2 class="text-2xl font-semibold mb-6 text-blue-300">📂 Proses File Event</h2>
+  <form method="POST" enctype="multipart/form-data" class="space-y-5">
+    <div>
+      <label class="block mb-2 text-sm font-medium">🏢 Instansi</label>
+      <select name="instansi" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+        <option value="kemkes">KEMKES</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-2 text-sm font-medium">🕐 Shift</label>
+      <select name="shift" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+        <option value="1">Shift 1 (08.00 - 16.00)</option>
+        <option value="2">Shift 2 (16.00 - 00.00)</option>
+        <option value="3">Shift 3 (00.00 - 08.00)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-2 text-sm font-medium">📎 Upload File (.txt / .xml)</label>
+      <input type="file" name="file" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-gray-300">
+    </div>
+
+    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 transition-all text-white font-semibold py-3 rounded-lg shadow-md">
+      🚀 Proses Sekarang
+    </button>
+  </form>
+</div>
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="mt-6 glass border-l-4 border-yellow-400 p-4 rounded-lg text-yellow-100">
+      {% for msg in messages %}
+        <p>⚠️ {{ msg }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% if process_log %}
+  <div class="mt-10 glass p-6 rounded-2xl">
+    <h3 class="text-lg font-semibold text-blue-300 mb-2">🧾 Log Proses</h3>
+    <pre class="whitespace-pre-wrap text-sm bg-gray-900 p-4 rounded-lg overflow-y-auto max-h-72 border border-gray-700 text-gray-200">{{ process_log }}</pre>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+Selamat Pagi Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring/pivot data Botnet AAL pada Shift 1,
+dimana terdeteksi aktivitas botnet domain sebagai berikut :
+
+*IP: 1.1.1.1* (Total: 1 deteksi)
+ - example.com (1 event)
+
+Total Keseluruhan Event Botnet: 1 event
+
+Demikian atas informasinya.
+Terimakasih,
+SOC Neotech

@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola request HTTP yang sesuai dengan signature Suspicious File Downloading Detection. Signature ini mengindikasikan adanya upaya mengakses atau mengunduh file tertentu yang berpotensi berisi informasi sensitif atau dapat dimanfaatkan untuk proses reconnaissance maupun eksploitasi lanjutan terhadap aplikasi web.
+
+Berdasarkan log, request berasal dari alamat IP Cloudflare, sehingga IP sumber yang terlihat merupakan reverse proxy dan belum tentu merupakan alamat IP asli dari klien yang mengirimkan request. Oleh karena itu, diperlukan pemeriksaan terhadap log web server atau aplikasi untuk memperoleh client IP sebenarnya (misalnya melalui header CF-Connecting-IP atau X-Forwarded-For).
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya percobaan akses terhadap file dan belum terdapat bukti bahwa file berhasil diunduh ataupun terjadi kebocoran informasi. Diperlukan pemeriksaan lebih lanjut terhadap access log dan respons HTTP untuk memastikan hasil dari request tersebut.
+
+===============================
+
+Mitigasi :<br>
+- Tinjau access log dan application log pada server {dst_ip} untuk mengidentifikasi request menuju pre_connect_check.php pada waktu kejadian.
+- Identifikasi alamat IP asli klien melalui header CF-Connecting-IP atau X-Forwarded-For, mengingat request melewati layanan Cloudflare.
+- Verifikasi respons HTTP yang diberikan aplikasi (misalnya 200 OK, 403 Forbidden, atau 404 Not Found) untuk memastikan apakah file berhasil diakses.
+- Pastikan file pre_connect_check.php memang merupakan bagian dari aplikasi yang sah dan tidak mengekspos informasi sensitif kepada pengguna yang tidak berwenang.
+- Tinjau hak akses terhadap file dan direktori aplikasi serta batasi akses ke file yang tidak seharusnya dapat diakses dari internet.
+- Apabila request dipastikan merupakan aktivitas yang tidak sah, lakukan pemblokiran terhadap alamat IP asli penyerang melalui WAF, Firewall, atau mekanisme keamanan lainnya sesuai kebijakan keamanan.
+- Lakukan monitoring terhadap aktivitas serupa maupun indikasi eksploitasi lanjutan pada aplikasi web.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

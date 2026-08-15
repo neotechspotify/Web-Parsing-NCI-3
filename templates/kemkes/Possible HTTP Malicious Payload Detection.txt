@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi adanya pola payload HTTP yang sesuai dengan signature Possible HTTP Malicious Payload Detection. Signature ini bersifat generik dan dirancang untuk mengidentifikasi request yang mengandung karakteristik yang umum ditemukan pada percobaan eksploitasi aplikasi web, seperti payload untuk Remote Code Execution (RCE), Command Injection, PHP Injection, maupun teknik eksploitasi lainnya.
+
+Berdasarkan log, request berasal dari alamat IP Cloudflare, sehingga IP sumber yang terlihat merupakan reverse proxy dan belum tentu merupakan alamat IP asli dari klien yang mengirimkan request. Oleh karena itu, diperlukan pemeriksaan terhadap log web server atau aplikasi untuk memperoleh client IP sebenarnya (misalnya melalui header CF-Connecting-IP atau X-Forwarded-For).
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya percobaan pengiriman payload mencurigakan dan belum terdapat bukti bahwa payload berhasil diproses atau aplikasi berhasil dieksploitasi. Diperlukan pemeriksaan lebih lanjut terhadap log aplikasi dan respons HTTP untuk memastikan dampak dari aktivitas tersebut.
+
+===============================
+
+Mitigasi :<br>
+-Tinjau access log dan application log pada server {dst_ip} untuk mengidentifikasi request yang mengarah ke index.php pada waktu kejadian.
+- Identifikasi alamat IP asli klien melalui header CF-Connecting-IP atau X-Forwarded-For, mengingat request melewati layanan Cloudflare.
+- Verifikasi respons HTTP yang diberikan aplikasi (misalnya 200 OK, 403 Forbidden, atau 500 Internal Server Error) untuk memastikan apakah payload berhasil diproses.
+- Periksa parameter yang dikirimkan dalam request guna memastikan tidak terdapat upaya eksploitasi terhadap celah keamanan pada aplikasi.
+- Pastikan aplikasi web, framework, dan plugin yang digunakan telah diperbarui dengan patch keamanan terbaru serta menerapkan validasi input yang memadai.
+- Apabila payload dipastikan merupakan upaya eksploitasi yang tidak sah, lakukan pemblokiran terhadap alamat IP asli penyerang melalui WAF, Firewall, atau mekanisme keamanan lainnya.
+- Lakukan monitoring terhadap aktivitas serupa maupun indikasi eksploitasi lanjutan pada aplikasi web.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

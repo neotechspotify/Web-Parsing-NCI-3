@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi permintaan DNS menuju domain malicious, yang telah diklasifikasikan sebagai domain berbahaya berdasarkan basis data DNS Security. Pada log ini, aksi yang dilakukan adalah sinkhole, yang berarti perangkat keamanan mengalihkan (redirect) permintaan DNS ke alamat sinkhole sehingga host internal tidak dapat terhubung ke domain tujuan yang berpotensi berbahaya.
+
+Aktivitas seperti ini dapat disebabkan oleh pengguna yang mengakses domain tersebut secara langsung, aplikasi yang melakukan koneksi otomatis, browser yang memuat konten eksternal, atau malware yang mencoba berkomunikasi dengan server Command and Control (C2).
+
+Berdasarkan log yang tersedia, koneksi ke domain berbahaya telah berhasil dicegah (sinkhole) sehingga komunikasi dengan domain tujuan tidak terjadi. Namun demikian, diperlukan pemeriksaan lebih lanjut pada endpoint untuk memastikan penyebab munculnya query DNS tersebut dan menyingkirkan kemungkinan adanya malware atau aplikasi yang tidak sah.
+
+===============================
+
+Mitigasi :<br>
+- Identifikasi aplikasi atau proses pada endpoint {dst_ip} yang melakukan query DNS malicious.
+- Lakukan pemeriksaan menggunakan EDR atau antivirus untuk memastikan tidak terdapat malware, adware, browser hijacker, atau aplikasi tidak sah pada endpoint.
+- Tinjau riwayat browser dan aktivitas pengguna untuk memastikan apakah akses dilakukan secara sengaja atau berasal dari redirect iklan maupun situs pihak ketiga.
+- Periksa log DNS, proxy, dan firewall untuk memastikan tidak terdapat percobaan koneksi lanjutan ke domain atau indikator kompromi lainnya.
+- Pastikan endpoint telah menggunakan antivirus/EDR dengan signature terbaru dan sistem operasi beserta aplikasi telah diperbarui.
+- Pertahankan kebijakan DNS Sinkhole atau DNS Security pada firewall agar domain berbahaya tetap diblokir.
+- Lakukan monitoring terhadap endpoint {dst_ip} untuk mendeteksi query DNS serupa maupun komunikasi ke domain berbahaya lainnya.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

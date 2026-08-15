@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}📘 Dokumentasi - WebApp SOC{% endblock %}
+
+{% block content %}
+<main class="container mx-auto px-6 py-10">
+  <div class="glass bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8">
+    <h1 class="text-3xl font-semibold text-blue-300 mb-6 flex items-center gap-2">
+      📘 Dokumentasi WebApp SOC
+    </h1>
+
+    <!-- Tabs Navigation -->
+    <div class="flex flex-wrap border-b border-slate-700 mb-6">
+      <button class="tab-btn px-4 py-2 text-sm font-medium text-gray-300 border-b-2 border-transparent hover:text-blue-400"
+              onclick="showTab('user')">👤 Panduan Pengguna</button>
+      <button class="tab-btn px-4 py-2 text-sm font-medium text-gray-300 border-b-2 border-transparent hover:text-purple-400"
+              onclick="showTab('dev')">⚙️ Dokumentasi Teknis</button>
+      <button class="tab-btn px-4 py-2 text-sm font-medium text-gray-300 border-b-2 border-transparent hover:text-green-400"
+              onclick="showTab('mitigasi')">🛡️ Mitigasi & Referensi</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-user" class="tab-content space-y-4">
+      <h2 class="text-xl font-semibold text-blue-300">👤 Panduan Pengguna</h2>
+      <p class="text-gray-300 leading-relaxed">
+        WebApp SOC membantu tim analyst memproses log keamanan dan membuat event secara otomatis atau manual.
+      </p>
+      <div class="space-y-3 text-sm text-gray-200">
+        <p>🔹 <strong>Dashboard:</strong> Unggah file <code>.txt</code> / <code>.xml</code> untuk parsing otomatis.</p>
+        <p>🔹 <strong>Buat Event:</strong> Isi data manual atau gunakan <i>Raw Mode</i> dengan format TSV.</p>
+        <p>🔹 <strong>Copy Template:</strong> Klik tombol 📋 untuk menyalin template event siap kirim.</p>
+        <p>🔹 <strong>Shift & Instansi:</strong> Pastikan memilih sesuai jadwal & lembaga terkait.</p>
+      </div>
+    </div>
+
+    <div id="tab-dev" class="tab-content hidden space-y-4">
+      <h2 class="text-xl font-semibold text-purple-300">⚙️ Dokumentasi Teknis</h2>
+      <p class="text-gray-300 leading-relaxed">
+        Bagian ini menjelaskan arsitektur dan fungsi utama dari aplikasi WebApp SOC.
+      </p>
+
+      <ul class="list-disc ml-6 text-gray-200 text-sm space-y-1">
+        <li><code>app.py</code> — Core Flask app, mengatur routing dan proses utama.</li>
+        <li><code>/templates/</code> — File HTML untuk tampilan web.</li>
+        <li><code>/data/events_magnitude_list.csv</code> — Daftar tingkat severity event.</li>
+        <li><code>create_manual_event_preview()</code> — Fungsi pembentuk template event manual.</li>
+        <li><code>parse_raw_line()</code> — Parsing 1 baris input raw (TSV) ke dictionary event.</li>
+      </ul>
+
+      <div class="mt-4 bg-gray-800 p-4 rounded-lg text-gray-300 text-xs border border-gray-700">
+        <strong>Contoh struktur direktori:</strong>
+<pre>
+📦 WebApp_SOC
+ ┣ 📂 database          ← tempat penyimpanan data/event
+ ┣ 📂 input             ← mungkin tempat upload file txt/log input
+ ┣ 📂 outputs           ← hasil pemrosesan / laporan event
+ ┣ 📂 templates         ← file HTML (Flask Jinja2 template)
+ ┣ 📂 static            ← file statis (CSS, JS)
+ ┣ 📂  __pycache__      ← cache Python
+ ┣ 📜 app.py            ← file utama Flask (kemungkinan entry point)
+ ┗ 📜 main_logic.py     ← berisi logika pemrosesan utama
+</pre>
+      </div>
+    </div>
+
+    <div id="tab-mitigasi" class="tab-content hidden space-y-4">
+      <h2 class="text-xl font-semibold text-green-300">🛡️ Mitigasi & Referensi Event</h2>
+      <p class="text-gray-300 leading-relaxed">
+        Referensi singkat mitigasi untuk event yang sering muncul pada sistem SOC.
+      </p>
+
+      <div class="bg-gray-800 p-5 rounded-lg text-sm border border-gray-700 space-y-3">
+        <div>
+          <h3 class="text-green-400 font-semibold">Nmap Scripting Engine Detection</h3>
+          <ul class="list-disc ml-5 text-gray-200">
+            <li>Kategori: Reconnaissance</li>
+            <li>Severity: Medium</li>
+            <li>Mitigasi:
+              <ul class="ml-5 list-disc">
+                <li>Blokir IP source pada EDL / Firewall</li>
+                <li>Review aktivitas port scanning</li>
+                <li>Update IDS/IPS signatures</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-green-400 font-semibold">HTTP Directory Traversal Attempt</h3>
+          <ul class="list-disc ml-5 text-gray-200">
+            <li>Kategori: Web Exploitation</li>
+            <li>Severity: High</li>
+            <li>Mitigasi:
+              <ul class="ml-5 list-disc">
+                <li>Update web server patch</li>
+                <li>Gunakan web application firewall (WAF)</li>
+                <li>Audit permission direktori web</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('border-blue-400','border-green-400','border-purple-400'));
+  
+  if (tab === 'user') {
+    document.getElementById('tab-user').classList.remove('hidden');
+    event.target.classList.add('border-blue-400');
+  } else if (tab === 'dev') {
+    document.getElementById('tab-dev').classList.remove('hidden');
+    event.target.classList.add('border-purple-400');
+  } else {
+    document.getElementById('tab-mitigasi').classList.remove('hidden');
+    event.target.classList.add('border-green-400');
+  }
+}
+</script>
+{% endblock %}

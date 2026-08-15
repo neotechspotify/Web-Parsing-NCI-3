@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Event Manual | WebApp SOC{% endblock %}
+
+{% block content %}
+<div class="glass p-8 rounded-2xl shadow-xl bg-white/10 border border-white/20">
+  <h2 class="text-xl font-semibold mb-4 text-green-300">
+    Instansi: <span class="text-white">{{ instansi.upper() }}</span> | Shift: {{ shift }}
+  </h2>
+
+  <!-- hasil template event -->
+  <div class="relative">
+    <button id="copyBtn" onclick="copyTemplate()" 
+            class="absolute top-2 right-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow">
+      📋 Copy
+    </button>
+
+    <!-- Tampilan bersih (tanpa render <br>) -->
+    <pre id="templateTextDisplay"
+         class="whitespace-pre-wrap bg-gray-900 p-5 rounded-lg text-sm text-gray-200 border border-gray-700 overflow-x-auto max-h-[75vh]">
+{{ hasil_event|trim|replace('<br>', '')|safe }}
+    </pre>
+
+    <!-- Disembunyikan, isi mentah untuk copy -->
+    <pre id="templateTextRaw" class="hidden">{{ hasil_event|trim }}</pre>
+  </div>
+
+  <!-- detail field event_dict -->
+  {% if event_dict %}
+  <div class="mt-8">
+    <h3 class="text-lg font-semibold text-green-300 mb-3">🧾 Detail Event (Fields)</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left bg-gray-900 border border-gray-700 rounded-lg">
+        <tbody>
+          {% for k, v in event_dict.items() %}
+          <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+            <td class="font-medium p-2 text-gray-300 w-48">{{ k }}</td>
+            <td class="p-2 text-gray-200">{{ v|safe|replace('<br>', '\n') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="mt-6 flex gap-4">
+  <a href="{{ url_for('daftar_event') }}" 
+     class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+     🏠 Kembali
+  </a>
+  {% if event_dict and event_dict.get('Nama Template') %}
+  {% set template_name = event_dict.get('Nama Template') %}
+  <a href="{{ url_for('buat_event', template=template_name, instansi=instansi) }}"
+     class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+     ⚙️ Gunakan Template Ini
+  </a>
+  <a href="{{ url_for('edit_event_template', instansi=instansi, template_name=template_name) }}"
+     class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+     ✏️ Edit Template
+  </a>
+
+  <button type="button" onclick="openDeleteModal('{{ template_name }}')"
+          class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm shadow-md flex items-center gap-1">
+    🗑️ Delete
+  </button>
+
+  <!-- Modal -->
+  <div id="deleteModal" class="fixed inset-0 hidden items-center justify-center z-50">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div id="deleteModalBox" class="bg-gray-900 text-gray-100 rounded-xl shadow-2xl w-96 max-w-full mx-4 p-6 z-50 transform scale-90 opacity-0 transition-all duration-200">
+      <h2 class="text-xl font-bold mb-4">Konfirmasi Hapus</h2>
+      <p class="mb-6">Apakah Anda yakin ingin menghapus template <span id="modalTemplateName" class="font-semibold"></span>?</p>
+      <div class="flex justify-end gap-3">
+        <button onclick="closeDeleteModal()" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg">Batal</button>
+        <form id="deleteForm" method="POST" action="{{ url_for('delete_event_template', instansi=instansi, template_name=template_name) }}">
+          <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg">Hapus</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyTemplate() {
+  // Ambil isi mentah (tetap dengan <br>)
+  const el = document.getElementById("templateTextRaw");
+  const raw = el.textContent;
+
+  const temp = document.createElement("textarea");
+  temp.value = raw; // tetap mengandung <br>
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+
+  const btn = document.getElementById("copyBtn");
+  btn.textContent = "✅ Copied!";
+  setTimeout(() => { btn.textContent = "📋 Copy"; }, 1500);
+}
+
+function openDeleteModal(templateName) {
+  const modal = document.getElementById('deleteModal');
+  const modalBox = document.getElementById('deleteModalBox');
+  const templateSpan = document.getElementById('modalTemplateName');
+
+  templateSpan.innerText = templateName;
+
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modalBox.classList.remove('scale-90','opacity-0');
+    modalBox.classList.add('scale-100','opacity-100');
+  }, 10);
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteModal');
+  const modalBox = document.getElementById('deleteModalBox');
+
+  modalBox.classList.remove('scale-100','opacity-100');
+  modalBox.classList.add('scale-90','opacity-0');
+
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 200);
+}
+
+// Klik overlay untuk menutup modal
+document.getElementById('deleteModal').addEventListener('click', function(e){
+  if(e.target === this) closeDeleteModal();
+});
+
+
+</script>
+{% endblock %}

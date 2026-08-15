@@ -1,0 +1,16 @@
+Selamat Pagi Rekan - Rekan,
+
+Berikut kami lampirkan hasil dari monitoring/pivot data Botnet AAL pada Shift 3,
+dimana terdeteksi aktivitas botnet domain sebagai berikut :
+
+*IP: 192.168.1.100* (Total: 1 deteksi)
+ - zeus_botnet.org (1 event)
+
+*IP: 192.168.1.101* (Total: 1 deteksi)
+ - mirai_cnc.net (1 event)
+
+Total Keseluruhan Event Botnet: 2 event
+
+Demikian atas informasinya.
+Terimakasih,
+SOC Neotech

@@ -1,0 +1,40 @@
+150	Putra	SOC-20251005-14245	Log Activity				"	ENV File Scanning Attempt"	Medium	05/10/2025	17:33:00	05/10/2025	17:41	0 Malam, 0 Jam 8 Menit 				Block IP on EDL	Close	Public to Public	103.125.189.79	Vietnam	103.74.143.57	80	Internal					.env	
+151	Putra	SOC-20251005-14246	Log Activity				Possible HTTP Malicious Payload Detection	High	05/10/2025	18:09	05/10/2025	18:19	0 Malam, 0 Jam 10 Menit 				Block IP on EDL	Close	Public to Public	45.131.193.70	United States	103.74.143.116	80	Internal				PBX.php		
+152	Putra	SOC-20251005-14247	Log Activity				Metasploit VxWorks WDB Agent Scanner Detection	Medium	05/10/2025	18:26:00	05/10/2025	18:28	0 Malam, 0 Jam 2 Menit 				Block IP on EDL	Close	Public to Public	47.254.45.170	United States	103.74.143.123	17185	Internal						
+153	Putra	SOC-20251005-14248	Log Activity				ZGrab Application Layer Scanner Detection	Medium	05/10/2025	18:59:00	05/10/2025	19:04	0 Malam, 0 Jam 5 Menit 				Block IP on EDL	Close	Public to Public	192.222.50.111	United States	202.70.136.32	8265	Internal						
+154	Putra	SOC-20251005-14249	Offensess	Policy Violation	Close		Local IRC Server Detected	High	05/10/2025	19:42:00	05/10/2025	19:45	0 Malam, 0 Jam 3 Menit 				Block IP on EDL	Close	Public to Public	167.99.149.204	United States	192.168.140.54	7000	Internal						
+155	Putra	SOC-20251005-14250	Log Activity				Metasploit VxWorks WDB Agent Scanner Detection	Medium	05/10/2025	22:30:00	05/10/2025	22:34	0 Malam, 0 Jam 4 Menit 				Block IP on EDL	Close	Public to Public	47.251.79.51	United States	202.70.136.192	17185							
+156	Bayu	SOC-20251005-14237	Offensess	Policy Violation	Close		Local IRC Server Detected	High	05/10/2025	22:36:00	05/10/2025	22:44	0 Malam, 0 Jam 8 Menit 				Block IP on EDL	Close	Public to Public	"188.166.14.127
+167.99.149.204
+146.190.249.45
+146.190.20.244
+185.196.9.189"	"Netherlands
+United States"	"192.168.140.105
+192.168.140.46
+192.168.140.39
+192.168.66.30
+192.168.140.149"	7000	Internal						
+157	Bayu	SOC-20251005-14238	Offensess	Policy Violation	Close		AndroxGh0st Scanning Traffic Detection	High	05/10/2025	22:05:00	05/10/2025	22:10	0 Malam, 0 Jam 5 Menit 				Block IP on EDL	Close	Public to Public	"155.2.192.235
+85.215.98.204
+157.245.152.245"	"Netherlands
+Germany
+United States"	"103.74.143.81
+103.74.143.138
+202.70.136.70"	80	Internal						
+158	Bayu	SOC-20251005-14239	Log Activity				Host Port Scan Detected by Remote Host	High	05/10/2025	21:44:00	05/10/2025	21:50	0 Malam, 0 Jam 6 Menit 				Block IP on EDL	Close	Public to Public	"94.102.51.35
+3.142.219.55"	"Russia
+United States"	"103.74.143.81
+202.70.136.245"	33388	Internal						
+159	Bayu	SOC-20251005-14240	Log Activity				Suspicious DNS Query	High	05/10/2025	23:27:00	05/10/2025	23:35	0 Malam, 0 Jam 8 Menit 				Block Domain on EDL	Close	Public to Public	103.74.143.201	Indonesia	1.1.1.1	53	Australia				"pornogorod.online
+pornhunter.wtf"		
+160	Bayu	SOC-20251005-14241	Log Activity				SIPVicious Scanner Detection	Medium	05/10/2025	16:15:00	05/10/2025	16:28	0 Malam, 0 Jam 13 Menit 				Block IP on EDL	Close	Public to Public	193.24.123.88	Germany	202.70.136.70	5060	Internal						
+161	Bayu	SOC-20251005-14242	Log Activity				Possible HTTP Malicious Payload Detection	High	05/10/2025	18:20:00	05/10/2025	18:30	0 Malam, 0 Jam 10 Menit 				Block IP on EDL	Close	Public to Public	"152.42.239.161
+157.66.54.162"	"United States
+Indonesia"	103.74.143.90	80	Internal					bash.alfa	
+162	Bayu	SOC-20251005-14243	Log Activity				PHP CGI Query String Parameter Handling Information Disclosure Vulnerability	Medium	05/10/2025	18:05	05/10/2025	18:15	0 Malam, 0 Jam 10 Menit 				Block IP on EDL	Close	Public to Public	157.245.207.55	United States	103.74.143.83	80	Internal						
+163	Bayu	SOC-20251005-14244	Log Activity				Suspicious or malformed HTTP Referer field	High	05/10/2025	22:48	05/10/2025	22:51	0 Malam, 0 Jam 3 Menit 				Block IP on EDL	Close	Public to Public	"62.60.130.213
+178.74.95.45"	"Iran
+Russia"	"103.74.143.76
+202.70.136.253"	"80
+443"	Internal					proxy.php	
+164	Bayu	SOC-20251005-14251	Log Activity				Realtek Jungle SDK Remote Code Execution Vulnerability	High	05/10/2025	23:44:00	05/10/2025	23:50	0 Malam, 0 Jam 6 Menit 				Block IP on EDL	Close	Public to Public	36.255.18.128	India	103.74.143.82	52869	Internal						

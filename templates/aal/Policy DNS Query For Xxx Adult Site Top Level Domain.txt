@@ -1,0 +1,48 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+URL/DNS :
+{url}
+
+===============================
+
+Alert ini tidak menunjukkan indikasi serangan atau malware, melainkan mengindikasikan akses atau percobaan akses ke domain dengan konten dewasa (.xxx) yang melanggar kebijakan penggunaan jaringan organisasi.
+Aktivitas bersifat policy violation dan bukan ancaman teknis langsung terhadap keamanan sistem.
+
+===============================
+
+Mitigasi :
+- Lakukan blokir domain jika terindikasi malicious 
+- Menerapkan Rules Restricted Outbound pada firewall untuk spesifik App yang sering menjadi jalur komunikasi Malicious Software. Seperti SMB, dll.
+
+===============================
+
+Terimakasih,
+SOC Neotech

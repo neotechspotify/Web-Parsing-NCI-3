@@ -1,0 +1,59 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi permintaan DNS menuju domain yang memiliki reputasi sebagai parked domain. Domain dengan status parked umumnya belum digunakan untuk layanan aktif atau hanya menampilkan halaman parkir milik penyedia domain. Dalam beberapa kasus, domain seperti ini dapat dimanfaatkan oleh malware, kampanye phishing, atau aktivitas Command and Control (C2), meskipun tidak semua parked domain bersifat berbahaya.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya permintaan resolusi DNS terhadap domain tersebut dan belum terdapat bukti bahwa host internal melakukan koneksi lanjutan atau mengalami kompromi. Oleh karena itu, diperlukan pemeriksaan lebih lanjut untuk memastikan aplikasi atau proses yang melakukan query DNS tersebut serta tujuan aksesnya.
+
+===============================
+
+Mitigasi :<br>
+-Identifikasi aplikasi atau proses pada host {dst_ip} yang melakukan query DNS ke {url}.
+- Tinjau log DNS, proxy, firewall, atau EDR untuk memastikan apakah setelah resolusi DNS terdapat koneksi HTTP/HTTPS atau komunikasi lanjutan ke domain atau IP terkait.
+- Verifikasi reputasi domain menggunakan sumber threat intelligence untuk memastikan apakah domain tersebut memiliki kaitan dengan malware, phishing, atau aktivitas berbahaya lainnya.
+- Lakukan pemindaian endpoint menggunakan antivirus atau EDR untuk memastikan tidak terdapat malware yang memanfaatkan domain tersebut.
+- Apabila domain dipastikan tidak memiliki kebutuhan operasional dan memiliki reputasi berbahaya, lakukan pemblokiran melalui DNS Filtering, Firewall, Web Filtering, atau Secure Web Gateway.
+- Lakukan monitoring terhadap host {dst_ip} untuk mendeteksi query DNS serupa maupun indikator kompromi (IOC) lainnya.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

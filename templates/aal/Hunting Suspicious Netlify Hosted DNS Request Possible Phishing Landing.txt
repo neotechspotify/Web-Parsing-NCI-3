@@ -1,0 +1,51 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+URL/DNS :
+{url}
+
+===============================
+
+Sistem keamanan mendeteksi adanya permintaan DNS menuju domain yang di-host pada platform publik dengan pola subdomain acak yang umum digunakan dalam skenario phishing.
+Aktivitas ini mengindikasikan kemungkinan bahwa endpoint internal telah mencoba mengakses link mencurigakan, yang berpotensi merupakan bagian dari serangan social engineering untuk 
+mendapatkan kredensial pengguna atau mendistribusikan malware. Meskipun tidak terdapat indikasi eksploitasi langsung pada tahap ini, aktivitas ini termasuk dalam fase awal serangan (Initial Access) dan 
+perlu dilakukan investigasi lebih lanjut untuk memastikan tidak adanya kompromi lanjutan pada endpoint terkait.
+
+===============================
+
+- Melakukan pengecekan pada endpoint sumber untuk memastikan tidak terdapat aktivitas mencurigakan lanjutan atau indikasi compromise.
+- Melakukan pemblokiran terhadap domain pada DNS filtering atau firewall untuk mencegah akses lanjutan.
+- Melakukan monitoring terhadap aktivitas DNS dan HTTP/HTTPS untuk mendeteksi kemungkinan akses ke domain sejenis (Netlify atau hosting publik lainnya).
+- Melakukan edukasi kepada user terkait potensi phishing dan pentingnya tidak mengakses link yang tidak dikenal atau mencurigakan.
+
+===============================
+
+Terimakasih,
+SOC Neotech

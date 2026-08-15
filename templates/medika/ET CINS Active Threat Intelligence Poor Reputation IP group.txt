@@ -1,0 +1,56 @@
+Dear Team MEDIKA,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal} {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya percobaan komunikasi anomali yang terjadi pada:
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination IP :
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+===============================
+
+Alamat IP sumber terdeteksi sebagai bagian dari CINS Active Threat Intelligence, yaitu daftar threat intelligence yang mengidentifikasi alamat IP 
+dengan reputasi buruk berdasarkan aktivitas berbahaya yang diamati di internet, seperti pemindaian (scanning), malware, botnet, brute force,
+maupun aktivitas mencurigakan lainnya.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan adanya komunikasi dari IP yang memiliki reputasi buruk menuju server internal. 
+Namun, alert ini tidak secara langsung membuktikan bahwa telah terjadi eksploitasi atau kompromi pada host tujuan, sehingga diperlukan verifikasi 
+lebih lanjut terhadap aktivitas yang dilakukan oleh IP tersebut.
+
+===============================
+
+Mitigasi :
+
+- Verifikasi apakah server memang menyediakan layanan yang dapat diakses dari Internet.
+- Lakukan pengecekan pada log mail server (Postfix, Exim, Exchange, atau lainnya) untuk memastikan apakah koneksi dari Alamat IP berhasil melakukan autentikasi atau hanya sebatas membuka koneksi.
+- Korelasikan dengan log firewall, IDS, maupun authentication log untuk memastikan tidak terdapat aktivitas lanjutan seperti brute force atau percobaan login.
+- Monitor apabila alamat IP tersebut melakukan koneksi berulang atau muncul pola scanning terhadap layanan lain.
+- Apabila tidak terdapat kebutuhan bisnis yang sah, pertimbangkan untuk melakukan blocking terhadap IP tersebut melalui firewall atau External Dynamic List (EDL).
+- Terapkan policy deny untuk IP dengan reputasi buruk (CINS).
+
+===============================
+
+Terimakasih,
+SOC Neotech

@@ -1,0 +1,60 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed<br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada<br>
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP :<br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi pola request HTTP yang sesuai dengan aktivitas GitScanner, yaitu teknik yang digunakan untuk mencari file atau direktori Git yang terekspos ke internet, seperti .git/, file konfigurasi, maupun metadata repositori lainnya.
+
+Apabila direktori atau file Git dapat diakses oleh publik, penyerang berpotensi memperoleh source code aplikasi, riwayat perubahan (commit history), file konfigurasi, maupun informasi sensitif lainnya yang dapat dimanfaatkan untuk melakukan serangan lanjutan terhadap aplikasi.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya percobaan scanning dan belum terdapat bukti bahwa direktori atau file Git berhasil diakses. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap access log web server untuk memastikan respons yang diberikan terhadap request tersebut.
+===============================
+
+Mitigasi :<br>
+- Tinjau access log web server pada {dst_ip} untuk mengidentifikasi request yang berasal dari {src_ip}, khususnya permintaan menuju direktori .git/, file konfigurasi, maupun resource lain yang berkaitan dengan repositori Git.
+- Pastikan direktori .git, file konfigurasi, dan artefak pengembangan lainnya tidak dapat diakses melalui HTTP serta tidak berada pada web root yang dapat diakses publik.
+- Verifikasi respons HTTP terhadap request tersebut. Apabila ditemukan respons HTTP 200 OK, segera lakukan peninjauan terhadap informasi yang berpotensi terekspos dan lakukan rotasi kredensial apabila terdapat data sensitif di dalam repositori.
+- Pastikan hanya file aplikasi yang diperlukan untuk operasional yang dipublikasikan ke web server, sementara file source code, repositori, dan artefak pengembangan tidak ikut ter-deploy ke lingkungan produksi.
+- Pertimbangkan untuk memblokir alamat IP {src_ip} pada firewall, IPS, atau External Dynamic List (EDL) apabila aktivitas scanning terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan monitoring terhadap aktivitas scanning serupa maupun indikasi eksploitasi lanjutan pada web server.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

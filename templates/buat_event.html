@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Buat Event Manual | WebApp SOC{% endblock %}
+
+{% block content %}
+<div class="glass bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8">
+  <h2 class="text-2xl font-semibold mb-6 text-green-300">✏️ Buat Event Manual</h2>
+
+  <form method="POST" class="space-y-5">
+    <!-- Instansi -->
+    <div>
+      <label class="block mb-2 text-sm font-medium">🏢 Instansi</label>
+      <select name="instansi" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+        <option value="kemkes">KEMKES</option>
+      </select>
+    </div>
+
+    <!-- Shift -->
+    <div>
+      <label class="block mb-2 text-sm font-medium">🕐 Shift</label>
+      <select name="shift" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+        <option value="1">Shift 1 (08.00 - 16.00)</option>
+        <option value="2">Shift 2 (16.00 - 00.00)</option>
+        <option value="3">Shift 3 (00.00 - 08.00)</option>
+      </select>
+    </div>
+
+    <!-- Toggle Raw -->
+    <div class="flex items-center gap-3">
+      <input id="use_raw" name="use_raw" type="checkbox" class="w-4 h-4" onclick="toggleRawMode()">
+      <label for="use_raw" class="text-sm">Gunakan raw input (paste 1 baris TSV di bawah)</label>
+    </div>
+
+    <!-- Raw Block -->
+    <div id="raw_block" class="hidden space-y-3">
+      <label class="block mb-2 text-sm font-medium">📋 Raw Input (TSV)</label>
+      <textarea name="raw_text" rows="6"
+        class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+        placeholder="Paste baris TSV di sini"></textarea>
+      <p class="text-xs text-gray-400">Contoh: 214	Putra	Log Activity	Nmap Scripting Engine Detection	Medium	08/10/2025	0:49:00 ...</p>
+
+      <!-- Tombol proses raw -->
+      <button type="submit"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md">
+        🚀 Proses Raw Input
+      </button>
+    </div>
+
+    <!-- Manual Block -->
+    <div id="manual_block" class="space-y-5">
+      <div class="md:col-span-2">
+        <label class="block mb-2 text-sm font-medium">👤 Nama Analyst</label>
+        <input type="text" name="analyst" 
+          class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white" 
+          placeholder="Putra">
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label class="block mb-2 text-sm font-medium">📛 Nama Event</label>
+          <input type="text" name="event_name" list="eventSuggestions"
+                value="{{ prefill_data.get('Nama Event', '') }}"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+                placeholder="HTTP Directory Traversal Attempt">
+          <datalist id="eventSuggestions">
+            {% for e in all_event_names %}
+              <option value="{{ e }}">
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🔥 Severity</label>
+          <select name="severity"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white">
+            {% set selected = prefill_data.get('Severity', '') %}
+            <option {% if selected == 'Low' %}selected{% endif %}>Low</option>
+            <option {% if selected == 'Medium' %}selected{% endif %}>Medium</option>
+            <option {% if selected == 'High' %}selected{% endif %}>High</option>
+            <option {% if selected == 'Critical' %}selected{% endif %}>Critical</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🌐 Src IP</label>
+          <input type="text" name="src_ip"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="87.236.176.224">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🏳️ Src Country</label>
+          <input type="text" name="src_country"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="United Kingdom">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🎯 Dst IP</label>
+          <input type="text" name="dst_ip"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="202.70.136.32">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🔌 Dst Port</label>
+          <input type="text" name="dst_port"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="8080">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🏁 Dst Country</label>
+          <input type="text" name="dst_country"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="Internal">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium">🔍 Query</label>
+          <input type="text" name="query"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="Trinity.txt.bak">
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block mb-2 text-sm font-medium">🌐 URL / DNS</label>
+          <input type="text" name="url_dns"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="domain.target.com">
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block mb-2 text-sm font-medium">🕓 Waktu Deteksi</label>
+          <input type="text" name="waktu_deteksi"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white"
+            placeholder="08/10/2025 00:49:00">
+        </div>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md">
+        💾 Simpan & Tampilkan Hasil
+      </button>
+    </div>
+  </form>
+</div>
+
+{% if hasil_event %}
+<div class="mt-10 bg-white/10 border border-white/20 rounded-2xl p-6 relative">
+  <button id="copyBtn" onclick="copyTemplate()"
+          class="absolute top-2 right-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow">
+    📋 Copy
+  </button>
+  <pre id="templateText"
+       class="whitespace-pre-wrap bg-gray-900 p-5 rounded-lg text-sm text-gray-200 border border-gray-700 overflow-x-auto max-h-[70vh]">
+{{ hasil_event|trim }}
+  </pre>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleRawMode() {
+  const checked = document.getElementById('use_raw').checked;
+  document.getElementById('raw_block').classList.toggle('hidden', !checked);
+  document.getElementById('manual_block').classList.toggle('hidden', checked);
+}
+
+function copyTemplate() {
+  const el = document.getElementById("templateText");
+  const temp = document.createElement("textarea");
+  temp.value = el.innerText.replace(/\n\s+/g, "\n").replace(/<br>/g, "\n");
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+  const btn = document.getElementById("copyBtn");
+  btn.textContent = "✅ Copied!";
+  setTimeout(() => { btn.textContent = "📋 Copy"; }, 1500);
+}
+</script>
+{% endblock %}

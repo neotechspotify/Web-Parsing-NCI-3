@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Buat / Edit Template Event{% endblock %}
+
+{% block content %}
+<main class="container mx-auto px-6 py-10">
+  <div class="glass bg-white/10 border border-white/20 rounded-2xl shadow-xl p-8 max-w-3xl mx-auto">
+    <h1 class="text-3xl font-semibold text-blue-300 mb-6">✍️ Buat / Edit Template Event</h1>
+
+    <form method="POST" id="templateForm">
+      <!-- Pilih Instansi -->
+      <div class="mb-4">
+        <label class="block text-gray-200 mb-1">Instansi</label>
+            <select name="instansi" id="instansi" class="w-full p-3 rounded-lg bg-gray-800 text-white" required>
+                <option value="">-- Pilih Instansi --</option>
+                {% for inst in instansi_list %}
+                <option value="{{ inst }}">{{ inst.upper() }}</option>
+                {% endfor %}
+            </select>
+      </div>
+
+      <!-- Nama File Output -->
+      <div class="mb-4">
+        <label class="block text-gray-200 mb-1">Nama File (contoh: my_event.txt)</label>
+        <input type="text" name="filename" class="w-full p-3 rounded-lg bg-gray-800 text-white" required>
+      </div>
+
+      <!-- Deskripsi -->
+      <div class="mb-4">
+        <label class="block text-gray-200 mb-1">Deskripsi</label>
+        <textarea name="deskripsi" id="deskripsi" rows="5" class="w-full p-3 rounded-lg bg-gray-800 text-white" placeholder="Isi deskripsi..."></textarea>
+      </div>
+
+      <!-- Mitigasi -->
+      <div class="mb-4">
+        <label class="block text-gray-200 mb-1">Mitigasi</label>
+        <textarea name="mitigasi" id="mitigasi" rows="5" class="w-full p-3 rounded-lg bg-gray-800 text-white" placeholder="Isi mitigasi..."></textarea>
+      </div>
+
+      <div class="flex gap-4 mb-6">
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+          💾 Simpan Template
+        </button>
+        <a href="{{ url_for('daftar_event') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+          🏠 Kembali
+        </a>
+      </div>
+    </form>
+
+    <!-- Live Preview -->
+    <h2 class="text-2xl font-semibold text-green-300 mb-3">🔍 Preview Template</h2>
+    <pre id="previewBox" class="whitespace-pre-wrap bg-gray-900 p-5 rounded-lg text-sm text-gray-200 border border-gray-700 max-h-[60vh] overflow-auto">
+Template akan muncul di sini...
+    </pre>
+  </div>
+  <!-- Toast Tengah -->
+<div id="centerToast" class="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+  <div class="bg-green-600 text-white px-6 py-4 rounded-xl shadow-xl text-lg opacity-0 transform scale-90 transition-all duration-300 pointer-events-auto">
+    ✅ Template berhasil disimpan!
+  </div>
+</div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let templateContent = `Dear Team ,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan tindakan terhadap mitigasi:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada<br>
+
+src ip :<br>
+{src_ip}	 
+
+src Country :<br>
+{src_country} 
+
+dst ip :<br>
+{dst_ip}
+
+dst port :<br>
+{dst_port} 
+
+dst Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Deskripsi Event :<br>
+{deskripsi}
+
+===============================
+
+Mitigasi :<br>
+{mitigasi}
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech`;
+
+const deskripsiEl = document.getElementById("deskripsi");
+const mitigasiEl = document.getElementById("mitigasi");
+const previewEl = document.getElementById("previewBox");
+
+function updatePreview() {
+  let previewText = templateContent
+    .replace("{deskripsi}", deskripsiEl.value || "<deskripsi>")
+    .replace("{mitigasi}", mitigasiEl.value || "<mitigasi>");
+  previewEl.textContent = previewText;
+}
+
+deskripsiEl.addEventListener("input", updatePreview);
+mitigasiEl.addEventListener("input", updatePreview);
+updatePreview();
+
+// Fungsi menampilkan toast di tengah
+function showCenterToast(message) {
+    const toastWrapper = document.getElementById("centerToast");
+    const toast = toastWrapper.firstElementChild;
+    toast.textContent = message;
+
+    toast.classList.remove("opacity-0","scale-90");
+    toast.classList.add("opacity-100","scale-100");
+
+    // otomatis hilang setelah 3 detik
+    setTimeout(() => {
+        toast.classList.remove("opacity-100","scale-100");
+        toast.classList.add("opacity-0","scale-90");
+    }, 3000);
+}
+
+// Flash message dari Flask
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for msg in messages %}
+      showCenterToast("{{ msg|escape }}");
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+</script>
+{% endblock %}
+

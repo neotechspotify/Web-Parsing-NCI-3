@@ -1,0 +1,54 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port} 
+
+Query :
+{query}
+
+URL/DNS :
+{url}
+
+===============================
+
+Event ini mendeteksi Ada perangkat dari luar jaringan mencoba membuat koneksi ke aset internal, dan IP sumber tersebut termasuk dalam blocklist reputasi buruk (DShield).
+
+===============================
+
+Mitigasi :
+- Lakukan pembatasan akses (ACL) agar hanya IP atau jaringan tertentu yang boleh mengakses service internal
+- Aktifkan rate-limit atau protection terhadap port scanning di perangkat keamanan jaringan
+- Pastikan sistem memiliki patch dan update keamanan terbaru
+- Secara teratur lakukan pemindaian terhadap sistem yang terekspos secara publik dan lakukan patching jika ditemukan kerentanan kritis.
+- Terapkan OS hardening.
+- Gunakan WAF untuk membatasi dan mencegah adanya usaha eksploitasi dari pihak luar
+
+===============================
+
+Terimakasih,
+SOC Neotech

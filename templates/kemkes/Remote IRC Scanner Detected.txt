@@ -1,0 +1,60 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena sistem keamanan mendeteksi pola koneksi yang mengarah ke port-port IRC umum (seperti TCP/6660–6669, TCP/6697, atau port lain yang berkaitan dengan layanan IRC) pada banyak host tujuan dalam waktu singkat. Pola tersebut merupakan karakteristik aktivitas reconnaissance, yaitu upaya untuk mengidentifikasi host yang menjalankan layanan IRC atau layanan lain pada port tersebut.
+
+Aktivitas seperti ini sering dilakukan oleh penyerang atau botnet untuk mencari server IRC yang terbuka, mengidentifikasi layanan yang rentan, maupun menemukan server Command and Control (C2). Namun demikian, alert ini belum menunjukkan bahwa telah terjadi eksploitasi atau kompromi terhadap host tujuan dan umumnya hanya mengindikasikan adanya proses pemindaian jaringan.
+
+===============================
+
+Mitigasi :<br>
+- Identifikasi seluruh host internal yang menjadi target pemindaian serta verifikasi apakah benar menjalankan layanan IRC atau layanan lain pada port yang dipindai.
+- Tinjau firewall log, IDS/IPS, dan host log untuk memastikan tidak terdapat percobaan eksploitasi atau koneksi lanjutan setelah proses scanning.
+- Apabila layanan IRC tidak memiliki kebutuhan operasional, nonaktifkan layanan tersebut atau tutup akses dari jaringan publik.
+- Terapkan firewall atau Access Control List (ACL) untuk membatasi akses ke port IRC hanya dari jaringan atau alamat IP yang memiliki kebutuhan operasional.
+- Pertimbangkan untuk memblokir alamat IP sumber apabila aktivitas scanning terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan vulnerability assessment terhadap host yang menjadi target untuk memastikan tidak terdapat layanan yang rentan.
+- Lakukan monitoring terhadap aktivitas reconnaissance maupun upaya eksploitasi lanjutan yang berasal dari alamat IP sumber yang sama.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

@@ -1,0 +1,47 @@
+Dear Team AAL,
+
+Noted : IP source tersebut sudah kami block dari EDL.
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+===============================
+
+Event ini terjadi karena pada ip source tercatat pada Spamhaus DROP (Don't Route Or Peer), di mana daftar tersebut berisi network yang telah dibajak atau dikendalikan sepenuhnya oleh sindikat kriminal (seperti spammer atau malware operators). IP dalam daftar ini memiliki reputasi yang sangat buruk dan sering digunakan untuk aktivitas berbahaya atau upaya eksploitasi sistem.
+
+===============================
+
+Mitigasi :
+
+- Periksa apakah ip yang mengakses terdaftar pada whitelist.
+- Lakukan Bloking jika ip public terdeteksi sebagai bad reputation.
+- Terapkan policy deny untuk IP dengan reputasi buruk (Spamhaus DROP)
+===============================
+
+Terimakasih,
+SOC Neotech

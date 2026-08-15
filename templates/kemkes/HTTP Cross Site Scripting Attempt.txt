@@ -1,0 +1,62 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi adanya request HTTP yang mengandung pola yang sesuai dengan Cross-Site Scripting (XSS), yaitu teknik serangan yang memanfaatkan kelemahan validasi input pada aplikasi web untuk menyisipkan script berbahaya yang kemudian dieksekusi pada browser pengguna.
+
+Berdasarkan log, target yang diakses adalah file magpie_debug.php, yang mengindikasikan adanya upaya pemindaian atau pengujian terhadap halaman yang berpotensi memiliki kelemahan keamanan. Apabila aplikasi web rentan terhadap XSS, penyerang dapat menyisipkan kode JavaScript berbahaya yang berpotensi digunakan untuk mencuri cookie sesi, mengambil alih akun pengguna, melakukan defacement, maupun menjalankan serangan lanjutan terhadap pengguna aplikasi.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya percobaan eksploitasi (attempt) dan belum terdapat bukti bahwa payload XSS berhasil dieksekusi atau aplikasi berhasil dieksploitasi. Oleh karena itu, diperlukan pemeriksaan lebih lanjut terhadap access log web server dan respons aplikasi untuk memastikan apakah request tersebut berhasil diproses.
+
+===============================
+
+Mitigasi :<br>
+- Tinjau access log web server pada {dst_ip} untuk mengidentifikasi request dari {src_ip}, khususnya yang mengarah ke magpie_debug.php.
+- Verifikasi respons HTTP yang diberikan oleh aplikasi (misalnya 200 OK, 403 Forbidden, atau 404 Not Found) untuk memastikan apakah request berhasil diproses.
+- Pastikan seluruh parameter input pada aplikasi telah menerapkan input validation, output encoding, dan mekanisme sanitasi guna mencegah serangan Cross-Site Scripting (XSS).
+- Apabila file magpie_debug.php merupakan file debugging atau sudah tidak digunakan, pertimbangkan untuk menghapus atau membatasi akses terhadap file tersebut dari jaringan publik.
+- Pastikan aplikasi web beserta seluruh komponennya telah diperbarui ke versi yang didukung dan tidak memiliki kerentanan yang diketahui.
+- Pertimbangkan untuk memblokir alamat IP {src_ip} pada firewall, IPS, atau External Dynamic List (EDL) apabila aktivitas serupa terus berulang dan dipastikan bukan berasal dari pengguna yang sah.
+- Lakukan monitoring terhadap aktivitas serupa maupun indikasi eksploitasi lanjutan pada web server.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

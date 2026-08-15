@@ -1,0 +1,52 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+source ip :
+{src_ip}
+
+source country :
+{src_country}
+
+dst ip : 
+{dst_ip}
+({dst_desc})
+
+dst port :
+{dst_port}
+
+dst country :
+{dst_country}
+
+Query :
+{query}
+
+URL/DNS :
+{url}
+
+===============================
+
+{deskripsi}
+
+===============================
+
+Mitigasi :
+{mitigasi}
+
+===============================
+
+Terimakasih,
+SOC AAL

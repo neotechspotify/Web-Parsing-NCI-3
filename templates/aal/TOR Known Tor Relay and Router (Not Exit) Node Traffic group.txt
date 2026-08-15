@@ -1,0 +1,55 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+Query :
+{query}
+
+URL/DNS :
+{url}
+
+===============================
+
+Event ini terjadi karena pada ip source terdeteksi sedang menggunakan koneksi yang terenkripsi menggunakan traffic TOR, Ip Source tersebut sudah dilakukan pengecekkan pada VirusTotal dan ip tersebut memilki historical communicating files yang merupakan malware, backdoor.
+
+===============================
+
+Mitigasi :
+- Lakukan penyelidikan pada IP source.
+- Bloking ip source jika diperlukan.
+- Manajemen akses akun untuk membedakan hak istimewa untuk akun mengakses ke layanan akan membatasi izin dapat proses pada sistem lainnya.
+- Gunakan WAF untuk membatasi dan mencegah adanya usaha eksploitasi dari pihak luar
+- Perbarui perangkat lunak secara teratur
+- Secara teratur memindai sistem yang menghadap ke luar untuk mengetahui kerentanan.
+- Os hardening.
+
+===============================
+
+Terimakasih,
+SOC Neotech

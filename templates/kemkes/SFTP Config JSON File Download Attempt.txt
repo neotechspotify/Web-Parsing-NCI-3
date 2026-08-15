@@ -1,0 +1,63 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed <br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP : <br>
+{dst_ip} 
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Palo Alto mendeteksi request HTTP yang mengarah ke file sftp-config.json. File dengan nama tersebut umumnya digunakan untuk menyimpan konfigurasi koneksi SFTP, seperti hostname, port, username, direktori tujuan, dan dalam beberapa kasus dapat berisi kredensial autentikasi atau informasi sensitif lainnya.
+
+Penyerang sering melakukan scanning terhadap file konfigurasi yang umum digunakan oleh editor, IDE, atau aplikasi deployment untuk mencari informasi yang dapat dimanfaatkan sebagai langkah awal kompromi sistem.
+
+Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya percobaan akses terhadap file konfigurasi dan belum terdapat bukti bahwa file berhasil diunduh atau terjadi kebocoran informasi. Diperlukan pemeriksaan lebih lanjut terhadap access log dan respons HTTP untuk memastikan apakah file tersebut dapat diakses dari internet.
+
+===============================
+
+Mitigasi :<br>
+- Tinjau access log dan web server log pada {dst_ip} untuk mengidentifikasi request menuju sftp-config.json pada waktu kejadian.
+- Verifikasi respons HTTP yang diberikan server (misalnya 200 OK, 403 Forbidden, atau 404 Not Found) untuk memastikan apakah file berhasil diakses.
+- Pastikan file sftp-config.json tidak berada pada direktori yang dapat diakses publik. Jika file tersebut tidak diperlukan pada web root, segera hapus atau pindahkan ke lokasi yang aman.
+- Apabila file tersebut berisi kredensial atau informasi koneksi SFTP, lakukan rotasi password, SSH key, atau kredensial terkait sebagai tindakan pencegahan apabila terdapat indikasi file sempat terekspos.
+- Lakukan inventarisasi terhadap file konfigurasi, file backup, dan artefak pengembangan yang berada pada web server agar tidak dapat diakses melalui HTTP.
+- Terapkan aturan pada web server atau WAF untuk membatasi akses ke file konfigurasi yang bersifat sensitif.
+- Pertimbangkan untuk memblokir alamat IP apabila aktivitas scanning serupa terus berulang dan dipastikan bukan berasal dari pihak yang sah.
+- Lakukan monitoring terhadap aktivitas serupa maupun percobaan akses terhadap file sensitif lainnya.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech

@@ -1,0 +1,48 @@
+Dear Team Medika,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+source ip :
+{src_ip}
+
+source country :
+{src_country}
+
+destination ip : 
+{dst_ip}
+
+destination port :
+{dst_port}
+
+Payload :
+{payload}
+===============================
+
+Event ini terjadi karena IP Source terdeteksi melakukan akses ke halaman /public/phpinfo.php pada web server. 
+Aktivitas ini dapat mengindikasikan adanya upaya reconnaissance atau pemindaian terhadap aplikasi web untuk mengidentifikasi 
+informasi konfigurasi PHP pada server.
+
+===============================
+
+Mitigasi :
+- Lakukan Bloking jika IP public terdeteksi sebagai bad reputation.
+- Verifikasi akses ke path {payload} merupakan bagian dari aktivitas yang sah, seperti proses administrasi, pengujian aplikasi, atau troubleshooting oleh pihak yang berwenang.
+- Batasi akses ke halaman diagnostik seperti {payload} hanya untuk administrator atau jaringan internal menggunakan mekanisme autentikasi, ACL, atau firewall.
+- Lakukan monitoring terhadap log web server untuk memastikan tidak terdapat upaya akses ke resource sensitif atau aktivitas reconnaissance lanjutan.
+===============================
+
+Terimakasih,
+SOC Neotech

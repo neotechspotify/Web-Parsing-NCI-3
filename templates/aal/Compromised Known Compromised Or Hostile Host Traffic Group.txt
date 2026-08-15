@@ -1,0 +1,52 @@
+Dear Team AAL,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_type}
+Signature : {event_name}
+Severity : {magnitude}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+({dst_desc})
+
+Destination Port :
+{dst_port}
+
+Query :
+{query}
+
+URL/DNS :
+{url}
+
+===============================
+
+Event ini terjadi karena IP source tersebut terdeteksi dalam database/intelijen Threat Intelligence sebagai Known Compromised or Hostile Host. 
+Aktivitas yang tercatat adalah pengiriman paket ICMP (Destination Unreachable/Port Unreachable) ke aset internal kita,
+yang mengindikasikan adanya komunikasi dari host yang telah terkompromi atau dinilai berbahaya oleh sistem keamanan.
+
+===============================
+
+- Periksa apakah IP Source {src_ip} memiliki keperluan bisnis yang valid atau terdaftar pada whitelist internal.
+- Lakukan Bloking jika ip public terdeteksi sebagai bad reputation.
+- Lakukan monitoring dan pengecekan pada host tujuan {dst_ip} untuk memastikan tidak ada aktivitas lanjutan atau dampak dari anomali ini.
+
+===============================
+
+Terimakasih,
+SOC Neotech

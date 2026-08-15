@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Event Manual | WebApp SOC{% endblock %}
+
+{% block content %}
+<div class="glass p-8 rounded-2xl shadow-xl bg-white/10 border border-white/20">
+  <h2 class="text-xl font-semibold mb-4 text-green-300">
+    Instansi: <span class="text-white">{{ instansi.upper() }}</span> | Shift: {{ shift }}
+  </h2>
+
+  <!-- hasil template event -->
+  <div class="relative">
+    <button id="copyBtn" onclick="copyTemplate()" 
+            class="absolute top-2 right-2 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm shadow">
+      📋 Copy
+    </button>
+
+    <!-- Tampilan bersih (tanpa render <br>) -->
+    <pre id="templateTextDisplay"
+         class="whitespace-pre-wrap bg-gray-900 p-5 rounded-lg text-sm text-gray-200 border border-gray-700 overflow-x-auto max-h-[75vh]">
+{{ hasil_event|trim|replace('<br>', '')|safe }}
+    </pre>
+
+    <!-- Disembunyikan, isi mentah untuk copy -->
+    <pre id="templateTextRaw" class="hidden">{{ hasil_event|trim }}</pre>
+  </div>
+
+  <!-- detail field event_dict -->
+  {% if event_dict %}
+  <div class="mt-8">
+    <h3 class="text-lg font-semibold text-green-300 mb-3">🧾 Detail Event (Fields)</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left bg-gray-900 border border-gray-700 rounded-lg">
+        <tbody>
+          {% for k, v in event_dict.items() %}
+          <tr class="border-b border-gray-800 hover:bg-gray-800/50">
+            <td class="font-medium p-2 text-gray-300 w-48">{{ k }}</td>
+            <td class="p-2 text-gray-200">{{ v|safe|replace('<br>', '\n') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="mt-6 flex gap-4">
+  <a href="{{ url_for('index') }}" 
+     class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+     🏠 Kembali ke Dashboard
+  </a>
+  <a href="{{ url_for('buat_event') }}" 
+     class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md">
+     ✏️ Buat Lagi
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyTemplate() {
+  // Ambil isi mentah (tetap dengan <br>)
+  const el = document.getElementById("templateTextRaw");
+  const raw = el.textContent;
+
+  const temp = document.createElement("textarea");
+  temp.value = raw; // tetap mengandung <br>
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("copy");
+  document.body.removeChild(temp);
+
+  const btn = document.getElementById("copyBtn");
+  btn.textContent = "✅ Copied!";
+  setTimeout(() => { btn.textContent = "📋 Copy"; }, 1500);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed<br>
+Log Source : PA-KEMKES<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada<br>
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP :<br>
+{dst_ip}
+
+Destination Port :<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Malicious URL/DNS :<br>
+{url}
+
+===============================
+
+Perangkat keamanan Palo Alto WildFire mendeteksi bahwa email yang diterima mengandung tautan yang telah dikategorikan sebagai malicious. Berdasarkan karakteristiknya, email menggunakan subjek yang berpotensi dimanfaatkan sebagai umpan (lure) untuk mendorong penerima membuka tautan berbahaya.
+
+Apabila tautan tersebut diakses, pengguna berpotensi diarahkan ke halaman phishing, halaman pengunduhan malware, atau situs lain yang bertujuan mencuri kredensial maupun menginfeksi perangkat korban.
+
+Berdasarkan log yang tersedia, alert ini menunjukkan bahwa email telah diterima (Action: Allow). Namun, belum terdapat bukti bahwa penerima telah membuka tautan tersebut atau terjadi kompromi pada endpoint. Oleh karena itu, diperlukan pemeriksaan lebih lanjut untuk memastikan apakah tautan telah diakses dan apakah terdapat aktivitas lanjutan pada perangkat pengguna.
+
+===============================
+
+Mitigasi :<br>
+- Verifikasi kepada pemilik akun apakah email tersebut telah dibuka dan apakah tautan di dalam email telah diakses.
+- Lakukan pencarian dan penghapusan (search and purge) email serupa dari mailbox pengguna lain apabila email yang sama diterima oleh lebih dari satu penerima.
+- Blokir URL berbahaya tersebut pada Secure Email Gateway, Web Proxy, DNS Filtering, maupun Firewall untuk mencegah akses lebih lanjut.
+- Apabila tautan telah diakses, lakukan pemeriksaan pada endpoint pengguna, termasuk riwayat browser, proses yang berjalan, koneksi jaringan, dan hasil pemindaian antivirus/EDR.
+- Apabila terdapat indikasi pengguna memasukkan kredensial pada halaman tersebut, segera lakukan reset password serta aktifkan atau pastikan Multi-Factor Authentication (MFA) telah diterapkan.
+- Lakukan monitoring terhadap aktivitas login yang mencurigakan maupun komunikasi lanjutan ke domain atau indikator kompromi (IOC) terkait.
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech
