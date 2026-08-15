@@ -1,0 +1,50 @@
+Dear Team MEDIKA,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal} {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya percobaan komunikasi anomali yang terjadi pada:
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination IP :
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+===============================
+
+Alert ini mengindikasikan adanya query DNS ke domain dengan TLD .pw yang dikenal sering digunakan dalam aktivitas berbahaya seperti phishing, malware hosting, atau command and control (C2). Meskipun tidak secara langsung membuktikan adanya serangan, aktivitas ini termasuk kategori potentially hostile dan memerlukan investigasi lebih lanjut untuk memastikan legitimasi domain yang diakses.
+
+===============================
+
+Mitigasi :
+
+- Lakukan blokir domain jika terindikasi malicious 
+- Lakukan scanning anti virus secara teratur
+- Melakukan pengecekan terhadap endpoint apakah terdapat file/link yang mencurigakan jika terdapat file tersebut diharapkan untuk menghapus/delete file tersebut.
+- Disarankan user tidak mengklik link atau membuka file yang mencurigakan.
+- Filtering DNS
+- Menerapkan Rules Restricted Outbound pada firewall untuk spesifik App yang sering menjadi jalur komunikasi Malicious Software. Seperti SMB, dll.
+
+===============================
+
+Terimakasih,
+SOC Neotech
