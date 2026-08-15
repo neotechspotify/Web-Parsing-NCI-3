@@ -1,7 +1,5 @@
 # List-Domain-Blacklist.txt - Malicious and C2 domains
 5isohu.com
-
-
 www.fullmovies.xxx
 joker.aec944b68370194a50.link
 celebrated-kataifi-096eea.netlify.app
