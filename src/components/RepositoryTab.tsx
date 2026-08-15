@@ -616,6 +616,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
     const seenInFile = new Set<string>();
     const existingInRepo = new Set(structuredEntries.map(e => e.trimmed.toLowerCase()));
     const ipRegex = /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/;
+    const domainRegex = /^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?::\d+)?$/;
 
     rows.forEach((row, idx) => {
       let rawVal = row[columnKey];
@@ -625,23 +626,41 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
       }
 
       if (rawVal !== undefined && rawVal !== null) {
-        const valStr = String(rawVal).replace(/["']/g, '').trim();
-        const match = valStr.match(ipRegex);
-        if (match) {
-          const cleanIp = match[0];
-          const lowerIp = cleanIp.toLowerCase();
+        let valStr = String(rawVal).replace(/["']/g, '').trim();
+        let cleanEntry = '';
+
+        if (isDomainFile || columnKey.toLowerCase().includes('domain') || columnKey.toLowerCase().includes('host')) {
+          // Clean URL prefixes/paths if any
+          valStr = valStr.replace(/^https?:\/\//i, '').replace(/:\d+$/, '').split('/')[0].trim();
+          const isPureIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(valStr) || /^[\d\.:]+$/.test(valStr);
+          const parts = valStr.split('.');
+          const tld = parts[parts.length - 1];
+          const isValidTld = /^[a-zA-Z]{2,}$/.test(tld);
+
+          if (valStr && valStr.includes('.') && !valStr.includes(' ') && valStr !== '-' && valStr !== 'null' && !isPureIp && isValidTld) {
+            cleanEntry = valStr;
+          }
+        } else {
+          const match = valStr.match(ipRegex);
+          if (match) {
+            cleanEntry = match[0];
+          }
+        }
+
+        if (cleanEntry) {
+          const lowerVal = cleanEntry.toLowerCase();
 
           let status: 'new' | 'duplicate_in_file' | 'already_in_repo' = 'new';
-          if (existingInRepo.has(lowerIp)) {
+          if (existingInRepo.has(lowerVal)) {
             status = 'already_in_repo';
-          } else if (seenInFile.has(lowerIp)) {
+          } else if (seenInFile.has(lowerVal)) {
             status = 'duplicate_in_file';
           } else {
-            seenInFile.add(lowerIp);
+            seenInFile.add(lowerVal);
           }
 
           items.push({
-            ip: cleanIp,
+            ip: cleanEntry,
             originalRow: idx + 2,
             status,
             rawRowData: row
@@ -673,14 +692,17 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
         if (jsonRows.length > 0) {
           cols = Object.keys(jsonRows[0]);
         } else {
-          cols = ['source.ip'];
+          cols = isDomainFile ? ['botnetdomain', 'domain'] : ['source.ip'];
         }
 
         setParsedColumns(cols);
         setParsedRawRows(jsonRows);
 
-        const preferredCols = ['source.ip', 'source_ip', 'src_ip', 'source ip', 'src ip', 'ip', 'source', 'sourceip'];
-        const autoCol = cols.find(c => preferredCols.includes(c.trim().toLowerCase())) || cols[0] || 'source.ip';
+        const preferredCols = isDomainFile 
+          ? ['botnetdomain', 'botnet_domain', 'botnet domain', 'domain', 'domain.name', 'dns.query', 'host', 'destination.domain', 'target.domain', 'domain_name']
+          : ['source.ip', 'source_ip', 'src_ip', 'source ip', 'src ip', 'ip', 'source', 'sourceip'];
+
+        const autoCol = cols.find(c => preferredCols.includes(c.trim().toLowerCase())) || cols[0] || (isDomainFile ? 'botnetdomain' : 'source.ip');
 
         setSelectedTargetColumn(autoCol);
         extractAndFilterIPs(jsonRows, autoCol);
@@ -711,7 +733,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
       return;
     }
 
-    if (sanitizedText.includes(',') || sanitizedText.includes('source.ip') || sanitizedText.includes('\t')) {
+    if (sanitizedText.includes(',') || sanitizedText.includes('source.ip') || sanitizedText.includes('botnetdomain') || sanitizedText.includes('\t')) {
       try {
         const workbook = XLSX.read(sanitizedText, { type: 'string' });
         const sheetName = workbook.SheetNames[0];
@@ -723,8 +745,10 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
           setParsedColumns(cols);
           setParsedRawRows(jsonRows);
 
-          const preferredCols = ['source.ip', 'source_ip', 'src_ip', 'source ip', 'src ip', 'ip', 'source', 'sourceip'];
-          const autoCol = cols.find(c => preferredCols.includes(c.trim().toLowerCase())) || cols[0] || 'source.ip';
+          const preferredCols = isDomainFile 
+            ? ['botnetdomain', 'botnet_domain', 'botnet domain', 'domain', 'domain.name', 'dns.query', 'host', 'destination.domain', 'target.domain', 'domain_name']
+            : ['source.ip', 'source_ip', 'src_ip', 'source ip', 'src ip', 'ip', 'source', 'sourceip'];
+          const autoCol = cols.find(c => preferredCols.includes(c.trim().toLowerCase())) || cols[0] || (isDomainFile ? 'botnetdomain' : 'source.ip');
 
           setSelectedTargetColumn(autoCol);
           extractAndFilterIPs(jsonRows, autoCol);
@@ -742,26 +766,40 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
     const ipRegex = /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g;
 
     lines.forEach((line, idx) => {
-      const matches = line.match(ipRegex);
-      if (matches) {
-        matches.forEach(ipMatch => {
-          const cleanIp = ipMatch.trim();
-          const lowerIp = cleanIp.toLowerCase();
+      let cleanEntry = '';
+      if (isDomainFile) {
+        const cleaned = line.trim().replace(/^https?:\/\//i, '').replace(/:\d+$/, '').split('/')[0].trim();
+        const isPureIp = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(cleaned) || /^[\d\.:]+$/.test(cleaned);
+        const parts = cleaned.split('.');
+        const tld = parts[parts.length - 1];
+        const isValidTld = /^[a-zA-Z]{2,}$/.test(tld);
 
-          let status: 'new' | 'duplicate_in_file' | 'already_in_repo' = 'new';
-          if (existingInRepo.has(lowerIp)) {
-            status = 'already_in_repo';
-          } else if (seenInFile.has(lowerIp)) {
-            status = 'duplicate_in_file';
-          } else {
-            seenInFile.add(lowerIp);
-          }
+        if (cleaned && cleaned.includes('.') && !cleaned.includes(' ') && cleaned !== '-' && cleaned !== 'null' && !isPureIp && isValidTld) {
+          cleanEntry = cleaned;
+        }
+      } else {
+        const matches = line.match(ipRegex);
+        if (matches && matches.length > 0) {
+          cleanEntry = matches[0].trim();
+        }
+      }
 
-          items.push({
-            ip: cleanIp,
-            originalRow: idx + 1,
-            status
-          });
+      if (cleanEntry) {
+        const lowerVal = cleanEntry.toLowerCase();
+
+        let status: 'new' | 'duplicate_in_file' | 'already_in_repo' = 'new';
+        if (existingInRepo.has(lowerVal)) {
+          status = 'already_in_repo';
+        } else if (seenInFile.has(lowerVal)) {
+          status = 'duplicate_in_file';
+        } else {
+          seenInFile.add(lowerVal);
+        }
+
+        items.push({
+          ip: cleanEntry,
+          originalRow: idx + 1,
+          status
         });
       }
     });
@@ -1526,13 +1564,13 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                      Import IP Repository
+                      Import {isDomainFile ? 'Domain' : 'IP'} Repository
                       <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         Auto Deduplication
                       </span>
                     </h3>
                     <p className="text-xs text-slate-400">
-                      Import Excel (.xlsx), CSV, or text files and auto-filter duplicate IP entries
+                      Import Excel (.xlsx), CSV, or text files and auto-filter duplicate {isDomainFile ? 'domain' : 'IP'} entries
                     </p>
                   </div>
                 </div>
@@ -1604,13 +1642,15 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                       <div className="flex items-center justify-between bg-slate-800/40 border border-slate-700/60 p-3 rounded-xl">
                         <div className="flex items-center gap-2">
                           <Filter className="h-4 w-4 text-emerald-400" />
-                          <span className="text-xs font-medium text-slate-300">Target IP Column:</span>
+                          <span className="text-xs font-medium text-slate-300">
+                            Target {isDomainFile ? 'Domain (e.g. botnetdomain)' : 'IP'} Column:
+                          </span>
                         </div>
                         <select
                           id="select-target-column"
                           value={selectedTargetColumn}
                           onChange={(e) => handleTargetColumnChange(e.target.value)}
-                          className="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500"
+                          className="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500 font-mono font-semibold"
                         >
                           {parsedColumns.map((col, i) => (
                             <option key={i} value={col}>
@@ -1625,7 +1665,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-semibold text-slate-300">
-                        Paste CSV content or line-separated IP addresses:
+                        Paste CSV content or line-separated {isDomainFile ? 'domain names' : 'IP addresses'}:
                       </label>
                       <span className="text-[10px] font-mono font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-sm">
                         <CheckCircle2 className="h-3 w-3 text-emerald-400 shrink-0" />
@@ -1637,7 +1677,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                       rows={5}
                       value={rawPasteText}
                       onChange={(e) => handlePasteTextChange(e.target.value)}
-                      placeholder={`source.ip, destination.ip, description\n192.168.1.1, 10.0.0.1, Gateway\n10.0.0.15, 10.0.0.2, Host A`}
+                      placeholder={isDomainFile ? `botnetdomain, logsource, action\nnqwjmb.biz, FortiGate600E-AALHO-Main, redirect\niuzpxe.biz, FortiGate600E-AALHO-Main, redirect` : `source.ip, destination.ip, description\n192.168.1.1, 10.0.0.1, Gateway\n10.0.0.15, 10.0.0.2, Host A`}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500/50 resize-none"
                     />
                   </div>
@@ -1663,7 +1703,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                             id="btn-copy-card-formatted-output"
                             onClick={handleCopyFormattedOutput}
                             className="mt-1 px-2 py-0.5 text-[10px] bg-emerald-500/20 hover:bg-emerald-500/35 text-emerald-300 border border-emerald-500/30 rounded-md font-semibold transition-all inline-flex items-center gap-1 shadow"
-                            title="Copy formatted Source IP, Country, Dest IP, and Port text"
+                            title="Copy formatted metadata text"
                           >
                             {copiedFormattedOutput ? (
                               <>
@@ -1699,7 +1739,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                         <Copy className="h-4 w-4 text-emerald-400" />
                         <div>
                           <p className="text-xs font-bold text-slate-200">Copy New Unique Formatted Metadata</p>
-                          <p className="text-[11px] text-slate-400">Extracts Source IP, Source Country, Destination IP, and Destination Port from Excel</p>
+                          <p className="text-[11px] text-slate-400">Extracts metadata columns from Excel / CSV</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1790,7 +1830,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                       </div>
 
                       <span className="text-[11px] text-slate-400">
-                        Showing preview of extracted IPs
+                        Showing preview of extracted {isDomainFile ? 'domains' : 'IPs'}
                       </span>
                     </div>
 
@@ -1800,7 +1840,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                         <thead>
                           <tr className="border-b border-slate-800 bg-slate-900/80 text-[11px] uppercase text-slate-400 font-bold sticky top-0">
                             <th className="py-2 px-3 w-16">Row</th>
-                            <th className="py-2 px-3">IP Address</th>
+                            <th className="py-2 px-3">{isDomainFile ? 'Domain Name' : 'IP Address'}</th>
                             <th className="py-2 px-3">Status</th>
                             <th className="py-2 px-3 text-right">Action</th>
                           </tr>
@@ -1855,10 +1895,10 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                 <span className="text-xs text-slate-400">
                   {parsedIPList.filter(i => i.status === 'new').length > 0 ? (
                     <span className="text-emerald-400 font-medium">
-                      {parsedIPList.filter(i => i.status === 'new').length} unique IPs ready to append to repository
+                      {parsedIPList.filter(i => i.status === 'new').length} unique {isDomainFile ? 'domains' : 'IPs'} ready to append to repository
                     </span>
                   ) : (
-                    'Select or paste data containing IP addresses'
+                    `Select or paste data containing ${isDomainFile ? 'domain names' : 'IP addresses'}`
                   )}
                 </span>
 
@@ -1877,7 +1917,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                     className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-emerald-950/50 flex items-center gap-2"
                   >
                     <FileCheck className="h-4 w-4" />
-                    Import {parsedIPList.filter(i => i.status === 'new').length} New IPs
+                    Import {parsedIPList.filter(i => i.status === 'new').length} New {isDomainFile ? 'Domains' : 'IPs'}
                   </button>
                 </div>
               </div>
