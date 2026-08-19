@@ -504,7 +504,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
         let fileList = data.files;
         if (instansi.toLowerCase() === 'aal') {
           fileList = data.files.filter((f: BlacklistFile) => f.name === 'List-Domain-Blacklist.txt');
-        } else if (instansi.toLowerCase() === 'medika') {
+        } else if (instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei') {
           fileList = data.files.filter((f: BlacklistFile) => f.name === 'List-IP-Blacklist.txt');
         }
         setFiles(fileList);
@@ -533,7 +533,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
     if (instansi.toLowerCase() === 'aal' && filename !== 'List-Domain-Blacklist.txt') {
       return;
     }
-    if (instansi.toLowerCase() === 'medika' && filename !== 'List-IP-Blacklist.txt') {
+    if ((instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei') && filename !== 'List-IP-Blacklist.txt') {
       return;
     }
 
@@ -977,7 +977,7 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                 setSelectedInstansi(nextInstansi);
                 if (nextInstansi.toLowerCase() === 'aal') {
                   setSelectedFilename('List-Domain-Blacklist.txt');
-                } else if (nextInstansi.toLowerCase() === 'medika') {
+                } else if (nextInstansi.toLowerCase() === 'medika' || nextInstansi.toLowerCase() === 'asei') {
                   setSelectedFilename('List-IP-Blacklist.txt');
                 }
               }}
@@ -2127,6 +2127,10 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                         <span className="font-bold">🏥 MEDIKA:</span>
                         <span className="truncate ml-2 text-[10px] text-slate-300">database/medika/blacklists/List-IP-Blacklist.txt</span>
                       </div>
+                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'asei' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
+                        <span className="font-bold">🏢 ASEI:</span>
+                        <span className="truncate ml-2 text-[10px] text-slate-300">database/asei/blacklists/List-IP-Blacklist.txt</span>
+                      </div>
                       <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'aal' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
                         <span className="font-bold">🛡️ AAL:</span>
                         <span className="truncate ml-2 text-[10px] text-slate-300">database/aal/blacklists/List-Domain-Blacklist.txt</span>
@@ -2134,10 +2138,6 @@ export default function RepositoryTab({ instansiList }: RepositoryTabProps) {
                       <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'kemkes' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
                         <span className="font-bold">🏛️ KEMKES:</span>
                         <span className="truncate ml-2 text-[10px] text-slate-300">database/kemkes/blacklists/List-IP-Blacklist.txt</span>
-                      </div>
-                      <div className={`p-2 rounded-lg border flex items-center justify-between ${selectedInstansi.toLowerCase() === 'kemtan' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-slate-800 text-slate-400'}`}>
-                        <span className="font-bold">🌾 KEMTAN:</span>
-                        <span className="truncate ml-2 text-[10px] text-slate-300">database/kemtan/blacklists/List-IP-Blacklist.txt</span>
                       </div>
                     </div>
                   </div>

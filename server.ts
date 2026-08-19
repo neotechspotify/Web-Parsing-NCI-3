@@ -871,7 +871,7 @@ function applyHeuristicCorrections(eventData: any, rawLine: string, instansi: st
     return corrected;
   }
 
-  if (instansi.toLowerCase() === 'medika') {
+  if (instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei') {
     const parts = rawLine.split('\t').map(p => {
       let clean = p.trim();
       if (clean.startsWith('"') && clean.endsWith('"')) {
@@ -1064,8 +1064,8 @@ function applyHeuristicCorrections(eventData: any, rawLine: string, instansi: st
     }
   }
 
-  // 2. Extract quoted strings (which contain grouped IPs, countries, ports) semantically (skip for medika as it is fully and dynamically parsed above)
-  if (instansi.toLowerCase() !== 'medika') {
+  // 2. Extract quoted strings (which contain grouped IPs, countries, ports) semantically (skip for medika & asei as it is fully and dynamically parsed above)
+  if (instansi.toLowerCase() !== 'medika' && instansi.toLowerCase() !== 'asei') {
     const quotes = rawLine.match(/"([^"]*)"/g);
     if (quotes) {
       const cleanQuotes = quotes.map(q => q.replace(/^"|"$/g, '').trim());
@@ -2044,9 +2044,13 @@ app.all('/api/github-sync-pull', async (req, res) => {
 
     if (!treeRes.ok) {
       const errData: any = await treeRes.json().catch(() => ({}));
+      let msg = errData.message || treeRes.statusText;
+      if (treeRes.status === 401 || msg.includes('Bad credentials')) {
+        msg = 'Personal Access Token (PAT) tidak valid atau sudah kedaluwarsa (Bad credentials). Silakan perbarui Token di menu GitHub Settings.';
+      }
       return res.status(treeRes.status).json({
         success: false,
-        message: `Gagal membaca tree repository GitHub: ${errData.message || treeRes.statusText}`
+        message: `Gagal membaca tree repository GitHub: ${msg}`
       });
     }
 
@@ -2314,9 +2318,9 @@ app.get('/api/blacklists/:instansi', (req, res) => {
   const { instansi } = req.params;
   const baseDb = path.join(getDatabaseDir(), instansi);
   const blacklistDir = path.join(baseDb, 'blacklists');
-  const isMedika = instansi.toLowerCase() === 'medika';
+  const isMedikaOrAsei = instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei';
   const isAal = instansi.toLowerCase() === 'aal';
-  const filenames = isMedika 
+  const filenames = isMedikaOrAsei 
     ? ["List-IP-Blacklist.txt"] 
     : isAal 
     ? ["List-Domain-Blacklist.txt"] 
@@ -2336,9 +2340,9 @@ app.get('/api/blacklists/:instansi', (req, res) => {
       }
     }
 
-    // For medika and aal, delete other blacklist files if they exist to keep disk clean
-    if (isMedika || isAal) {
-      const allowedFile = isMedika ? "List-IP-Blacklist.txt" : "List-Domain-Blacklist.txt";
+    // For medika, asei, and aal, delete other blacklist files if they exist to keep disk clean
+    if (isMedikaOrAsei || isAal) {
+      const allowedFile = isMedikaOrAsei ? "List-IP-Blacklist.txt" : "List-Domain-Blacklist.txt";
       for (const filename of BLACKLIST_FILENAMES) {
         if (filename !== allowedFile) {
           const filePath = path.join(blacklistDir, filename);
@@ -2378,12 +2382,12 @@ app.get('/api/blacklists/:instansi/:filename', (req, res) => {
   const { instansi, filename } = req.params;
   const baseDb = path.join(getDatabaseDir(), instansi);
   const filePath = path.join(baseDb, 'blacklists', filename);
-  const isMedika = instansi.toLowerCase() === 'medika';
+  const isMedikaOrAsei = instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei';
   const isAal = instansi.toLowerCase() === 'aal';
 
   try {
-    if (isMedika && filename !== 'List-IP-Blacklist.txt') {
-      return res.status(403).json({ success: false, error: 'Access denied to this file for MEDIKA' });
+    if (isMedikaOrAsei && filename !== 'List-IP-Blacklist.txt') {
+      return res.status(403).json({ success: false, error: `Access denied to this file for ${instansi.toUpperCase()}` });
     }
     if (isAal && filename !== 'List-Domain-Blacklist.txt') {
       return res.status(403).json({ success: false, error: 'Access denied to this file for AAL' });
@@ -2413,12 +2417,12 @@ app.post('/api/blacklists/:instansi/:filename', (req, res) => {
   const { content } = req.body;
   const baseDb = path.join(getDatabaseDir(), instansi);
   const filePath = path.join(baseDb, 'blacklists', filename);
-  const isMedika = instansi.toLowerCase() === 'medika';
+  const isMedikaOrAsei = instansi.toLowerCase() === 'medika' || instansi.toLowerCase() === 'asei';
   const isAal = instansi.toLowerCase() === 'aal';
 
   try {
-    if (isMedika && filename !== 'List-IP-Blacklist.txt') {
-      return res.status(403).json({ success: false, error: 'Access denied to this file for MEDIKA' });
+    if (isMedikaOrAsei && filename !== 'List-IP-Blacklist.txt') {
+      return res.status(403).json({ success: false, error: `Access denied to this file for ${instansi.toUpperCase()}` });
     }
     if (isAal && filename !== 'List-Domain-Blacklist.txt') {
       return res.status(403).json({ success: false, error: 'Access denied to this file for AAL' });
@@ -3182,7 +3186,9 @@ SOC Neotech`;
 
         const shiftOutdir = cleanShiftFolder(outputDir, shift);
         const processedEventNames = new Set<string>();
-        const isMedika = instansi.toLowerCase() === 'medika';
+        const isAsei = instansi.toLowerCase() === 'asei';
+        const isMedikaOnly = instansi.toLowerCase() === 'medika';
+        const isMedika = isMedikaOnly || isAsei;
         const validTypes = isMedika
           ? ["log activity", "offensess", "offenses", "suricata", "misc attack", "attempted information leak", "information leak", "misc activity"]
           : ["log activity", "offensess", "offenses"];
@@ -3190,7 +3196,7 @@ SOC Neotech`;
         medikaPivotData = null;
         sectionBText = "";
 
-        if (isMedika && events.length > 0) {
+        if (isMedikaOnly && events.length > 0) {
           const destIpCounts: Record<string, number> = {};
           let destIpGrandTotal = 0;
 
@@ -3303,20 +3309,23 @@ SOC Neotech`;
             }
           }
 
+          const useTicketUnit = ['kemkes', 'medika', 'asei'].includes(instansi.toLowerCase());
+          const getUnit = (count: number) => useTicketUnit ? 'Ticket' : (count > 1 ? 'events' : 'event');
+
           let offensesStr = Object.entries(offensesCount)
-            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${count > 1 ? 'events' : 'event'})`)
+            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${getUnit(count)})`)
             .join("\n");
           if (!offensesStr) offensesStr = "Tidak ada event terdeteksi";
 
           let logsStr = Object.entries(logsCount)
-            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${count > 1 ? 'events' : 'event'})`)
+            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${getUnit(count)})`)
             .join("\n");
           if (!logsStr) logsStr = "Tidak ada event terdeteksi";
 
           let alertsStr = "";
           if (isMedika) {
             alertsStr = Object.entries(alertsCount)
-              .map(([name, count], i) => `${i + 1}. ${name} (${count} ${count > 1 ? 'events' : 'event'})`)
+              .map(([name, count], i) => `${i + 1}. ${name} (${count} ${getUnit(count)})`)
               .join("\n");
           }
           if (!alertsStr || alertsStr.trim() === "") {
@@ -3325,31 +3334,33 @@ SOC Neotech`;
 
           let destinationIpPortsStr = "";
 
-          if (imageFile) {
-            processLog.push(`📷 Screenshot Dashboard SIEM terdeteksi. Menjalankan Gemini Vision OCR...`);
-            const ocrText = await extractSectionBFromImage(
-              imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : Buffer.from([])),
-              imageFile.mimetype || 'image/png'
-            );
-            if (ocrText) {
-              destinationIpPortsStr = ocrText;
-              processLog.push(`✅ Berhasil membaca data Destination IP & Port dari screenshot.`);
-            } else {
-              processLog.push(`⚠️ Gemini Vision OCR tidak mengembalikan hasil dari screenshot.`);
+          if (!isAsei) {
+            if (imageFile) {
+              processLog.push(`📷 Screenshot Dashboard SIEM terdeteksi. Menjalankan Gemini Vision OCR...`);
+              const ocrText = await extractSectionBFromImage(
+                imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : Buffer.from([])),
+                imageFile.mimetype || 'image/png'
+              );
+              if (ocrText) {
+                destinationIpPortsStr = ocrText;
+                processLog.push(`✅ Berhasil membaca data Destination IP & Port dari screenshot.`);
+              } else {
+                processLog.push(`⚠️ Gemini Vision OCR tidak mengembalikan hasil dari screenshot.`);
+              }
+            } else if (req.body.section_b_text && req.body.section_b_text.trim()) {
+              destinationIpPortsStr = req.body.section_b_text.trim();
             }
-          } else if (req.body.section_b_text && req.body.section_b_text.trim()) {
-            destinationIpPortsStr = req.body.section_b_text.trim();
-          }
 
-          if (!destinationIpPortsStr) {
-            if (isMedika && events.length > 0) {
-              destinationIpPortsStr = buildDestinationIpPortsFromEvents(events);
-            } else {
-              destinationIpPortsStr = "Tidak ada data Destination IP & Port detected";
+            if (!destinationIpPortsStr) {
+              if (isMedikaOnly && events.length > 0) {
+                destinationIpPortsStr = buildDestinationIpPortsFromEvents(events);
+              } else {
+                destinationIpPortsStr = "Tidak ada data Destination IP & Port detected";
+              }
             }
-          }
 
-          sectionBText = destinationIpPortsStr;
+            sectionBText = destinationIpPortsStr;
+          }
 
           let waText = template
             .replace(/{salam}/g, greeting)
@@ -3378,7 +3389,7 @@ SOC Neotech`;
         }
 
         // Generate Pivot Table TXT and XLSX files for Medika
-        if (isMedika && medikaPivotData && medikaPivotData.rows.length > 0) {
+        if (isMedikaOnly && medikaPivotData && medikaPivotData.rows.length > 0) {
           // Sort IP address numerically
           medikaPivotData.rows.sort((a: any, b: any) => {
             const numA = a.ip.split('.').map((n: string) => parseInt(n, 10));
@@ -3396,7 +3407,7 @@ SOC Neotech`;
           }
           pivotTxtContent += `Grand Total\t${medikaPivotData.grandTotal}`;
 
-          const pivotTxtName = `pivot_ip_destination_medika_shift${shift}.txt`;
+          const pivotTxtName = `pivot_ip_destination_${instansi.toLowerCase()}_shift${shift}.txt`;
           const pivotTxtPath = path.join(shiftOutdir, pivotTxtName);
           fs.writeFileSync(pivotTxtPath, pivotTxtContent, 'utf-8');
 
@@ -3424,7 +3435,7 @@ SOC Neotech`;
           const pivotWb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(pivotWb, pivotWs, "Pivot Table IP Destination");
 
-          const pivotXlsxName = `pivot_ip_destination_medika_shift${shift}.xlsx`;
+          const pivotXlsxName = `pivot_ip_destination_${instansi.toLowerCase()}_shift${shift}.xlsx`;
           const pivotXlsxPath = path.join(shiftOutdir, pivotXlsxName);
           XLSX.writeFile(pivotWb, pivotXlsxPath);
 
@@ -3535,7 +3546,9 @@ SOC Neotech`;
       if (!hasWaReport) {
         const waTemplatePath = path.join(getTemplatesDir(), instansi, `wa_template_${instansi}.txt`);
         if (fs.existsSync(waTemplatePath)) {
-          const isMedika = instansi.toLowerCase() === 'medika';
+          const isAsei = instansi.toLowerCase() === 'asei';
+          const isMedikaOnly = instansi.toLowerCase() === 'medika';
+          const isMedika = isMedikaOnly || isAsei;
           const template = fs.readFileSync(waTemplatePath, 'utf-8');
           const shiftInfo = SHIFTS[shift];
           const greeting = shiftInfo ? shiftInfo[0] : "Selamat";
@@ -3549,8 +3562,11 @@ SOC Neotech`;
             offensesCount[name] = (offensesCount[name] || 0) + 1;
           }
 
+          const useTicketUnit = ['kemkes', 'medika', 'asei'].includes(instansi.toLowerCase());
+          const getUnit = (count: number) => useTicketUnit ? 'Ticket' : (count > 1 ? 'events' : 'event');
+
           let offensesStr = Object.entries(offensesCount)
-            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${count > 1 ? 'events' : 'event'})`)
+            .map(([name, count], i) => `${i + 1}. ${name} (${count} ${getUnit(count)})`)
             .join("\n");
           if (!offensesStr) offensesStr = "Tidak ada event terdeteksi";
 
@@ -3558,31 +3574,33 @@ SOC Neotech`;
           let alertsStr = isMedika ? offensesStr : "Tidak ada event terdeteksi";
           let destinationIpPortsStr = "";
 
-          if (imageFile) {
-            processLog.push(`📷 Screenshot Dashboard SIEM terdeteksi. Menjalankan Gemini Vision OCR...`);
-            const ocrText = await extractSectionBFromImage(
-              imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : Buffer.from([])),
-              imageFile.mimetype || 'image/png'
-            );
-            if (ocrText) {
-              destinationIpPortsStr = ocrText;
-              processLog.push(`✅ Berhasil membaca data Destination IP & Port dari screenshot.`);
-            } else {
-              processLog.push(`⚠️ Gemini Vision OCR tidak mengembalikan hasil dari screenshot.`);
+          if (!isAsei) {
+            if (imageFile) {
+              processLog.push(`📷 Screenshot Dashboard SIEM terdeteksi. Menjalankan Gemini Vision OCR...`);
+              const ocrText = await extractSectionBFromImage(
+                imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : Buffer.from([])),
+                imageFile.mimetype || 'image/png'
+              );
+              if (ocrText) {
+                destinationIpPortsStr = ocrText;
+                processLog.push(`✅ Berhasil membaca data Destination IP & Port dari screenshot.`);
+              } else {
+                processLog.push(`⚠️ Gemini Vision OCR tidak mengembalikan hasil dari screenshot.`);
+              }
+            } else if (req.body.section_b_text && req.body.section_b_text.trim()) {
+              destinationIpPortsStr = req.body.section_b_text.trim();
             }
-          } else if (req.body.section_b_text && req.body.section_b_text.trim()) {
-            destinationIpPortsStr = req.body.section_b_text.trim();
-          }
 
-          if (!destinationIpPortsStr) {
-            if (isMedika && rows.length > 0) {
-              destinationIpPortsStr = buildDestinationIpPortsFromEvents(rows);
-            } else {
-              destinationIpPortsStr = "Tidak ada data Destination IP & Port detected";
+            if (!destinationIpPortsStr) {
+              if (isMedikaOnly && rows.length > 0) {
+                destinationIpPortsStr = buildDestinationIpPortsFromEvents(rows);
+              } else {
+                destinationIpPortsStr = "Tidak ada data Destination IP & Port detected";
+              }
             }
-          }
 
-          sectionBText = destinationIpPortsStr;
+            sectionBText = destinationIpPortsStr;
+          }
 
           let waText = template
             .replace(/{salam}/g, greeting)

@@ -1,0 +1,2 @@
+# List-IP-Blacklist.txt - Malicious and C2 IP addresses for ASEI
+# Add IP entries line by line (e.g. 192.168.1.1 or 10.0.0.0/24)

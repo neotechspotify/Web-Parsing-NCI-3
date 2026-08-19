@@ -1,0 +1,54 @@
+Dear Team ASEI,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+=================================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+=================================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination ip : 
+{dst_ip}
+
+Destination port :
+{dst_port}
+
+===============================
+
+Alamat IP sumber terdeteksi sebagai bagian dari Spamhaus DROP List, yaitu daftar jaringan yang diketahui memiliki reputasi buruk dan 
+sering dikaitkan dengan aktivitas berbahaya seperti malware, botnet, command and control (C2), spam, maupun aktivitas pemindaian (scanning). 
+Alert ini menunjukkan bahwa terdapat komunikasi dari IP dengan reputasi buruk menuju server internal.
+
+Berdasarkan log yang tersedia, alert ini tidak secara langsung membuktikan bahwa telah terjadi eksploitasi atau kompromi, 
+namun menunjukkan adanya komunikasi dari sumber yang memiliki reputasi buruk sehingga perlu dilakukan verifikasi lebih lanjut terhadap 
+aktivitas yang terjadi pada host tujuan.
+
+===============================
+
+Mitigasi :
+- Verifikasi apakah komunikasi dari alamat IP sumber merupakan aktivitas yang sah atau memiliki kebutuhan bisnis yang valid.
+- Lakukan pemeriksaan pada log firewall, web server, maupun sistem terkait untuk memastikan tidak terdapat aktivitas lanjutan dari alamat IP tersebut.
+- Blokir alamat IP sumber pada firewall atau tambahkan ke daftar blokir (EDL/Threat Feed) apabila tidak terdapat kebutuhan bisnis yang sah.
+- Lakukan monitoring terhadap host tujuan untuk mengidentifikasi adanya indikasi percobaan eksploitasi atau aktivitas mencurigakan lainnya yang berasal dari alamat IP tersebut.
+- Terapkan policy deny untuk IP dengan reputasi buruk (Spamhaus DROP)
+
+===============================
+
+Terimakasih,
+SOC Neotech

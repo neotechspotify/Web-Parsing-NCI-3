@@ -1,0 +1,47 @@
+Dear Team Medika,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+====================================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal}, {waktu}
+
+====================================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination IP : 
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+=====================================
+
+Terdeteksi paket TCP SYN tanpa payload dengan karakteristik yang sesuai dengan signature ET SCAN NMAP -sS window 1024, yang mengindikasikan adanya aktivitas TCP SYN Scan (-sS) atau aktivitas lain yang memiliki pola serupa. 
+Aktivitas ini umumnya dilakukan pada tahap reconnaissance untuk mengidentifikasi port atau layanan yang terbuka pada host tujuan sebelum dilakukan aktivitas lanjutan.
+=====================================
+
+Mitigasi :
+- Verifikasi apakah alamat IP sumber merupakan bagian dari aktivitas yang sah atau memiliki kebutuhan bisnis yang valid.
+- Lakukan pengecekan pada firewall, web server, maupun sistem terkait untuk memastikan tidak terdapat aktivitas lanjutan dari alamat IP tersebut.
+- Blokir alamat IP sumber apabila tidak terdapat kebutuhan bisnis yang sah atau teridentifikasi sebagai aktivitas pemindaian yang berulang.
+- Pastikan hanya layanan yang diperlukan yang diekspos ke internet dan terapkan pembatasan akses melalui firewall, ACL, atau mekanisme filtering lainnya.
+
+======================================
+
+Terimakasih,
+SOC Neotech
