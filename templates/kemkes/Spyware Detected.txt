@@ -46,12 +46,12 @@ Berdasarkan log yang tersedia, alert ini hanya menunjukkan adanya permintaan res
 ===============================
 
 Mitigasi :<br>
--Identifikasi aplikasi atau proses pada host {dst_ip} yang melakukan query DNS ke {url}.
+-Identifikasi aplikasi atau proses pada host yang melakukan query DNS.
 - Tinjau log DNS, proxy, firewall, atau EDR untuk memastikan apakah setelah resolusi DNS terdapat koneksi HTTP/HTTPS atau komunikasi lanjutan ke domain atau IP terkait.
 - Verifikasi reputasi domain menggunakan sumber threat intelligence untuk memastikan apakah domain tersebut memiliki kaitan dengan malware, phishing, atau aktivitas berbahaya lainnya.
 - Lakukan pemindaian endpoint menggunakan antivirus atau EDR untuk memastikan tidak terdapat malware yang memanfaatkan domain tersebut.
 - Apabila domain dipastikan tidak memiliki kebutuhan operasional dan memiliki reputasi berbahaya, lakukan pemblokiran melalui DNS Filtering, Firewall, Web Filtering, atau Secure Web Gateway.
-- Lakukan monitoring terhadap host {dst_ip} untuk mendeteksi query DNS serupa maupun indikator kompromi (IOC) lainnya.
+- Lakukan monitoring terhadap host untuk mendeteksi query DNS serupa maupun indikator kompromi (IOC) lainnya.
 
 ===============================
 
