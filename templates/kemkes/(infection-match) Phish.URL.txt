@@ -30,7 +30,7 @@ Destination Port:<br>
 Destination Country :<br>
 {dst_country}
 
-Query :<br>
+Request:<br>
 {query}
 
 URL/DNS :<br>
@@ -38,7 +38,7 @@ URL/DNS :<br>
 
 ===============================
 
-Event ini terjadi karena perangkat keamanan Trellix MPS mendeteksi adanya HTTP request menuju path {request} pada server {url}. Request tersebut mengarah ke file PHP yang berada pada struktur library/dependency aplikasi dan dapat mengindikasikan aktivitas reconnaissance atau probing terhadap file yang berpotensi memiliki kerentanan atau tidak seharusnya dapat diakses secara langsung.
+Event ini terjadi karena perangkat keamanan Trellix MPS mendeteksi adanya HTTP request menuju path {query} pada server {url}. Request tersebut mengarah ke file PHP yang berada pada struktur library/dependency aplikasi dan dapat mengindikasikan aktivitas reconnaissance atau probing terhadap file yang berpotensi memiliki kerentanan atau tidak seharusnya dapat diakses secara langsung.
 
 Berdasarkan log yang tersedia, aktivitas tersebut terdeteksi dengan signature Phish.URL dan belum menunjukkan adanya bukti keberhasilan eksploitasi. Namun, perlu dilakukan pengecekan lebih lanjut terhadap web server untuk memastikan apakah request tersebut berhasil diakses dan tidak terdapat aktivitas lanjutan seperti eksploitasi atau eksekusi file berbahaya.
 
