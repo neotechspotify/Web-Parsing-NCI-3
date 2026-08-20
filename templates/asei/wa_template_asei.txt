@@ -8,7 +8,7 @@ A. Alert :
 {alerts}
 
 Rekomendasi :
-• Apabila tidak terdapat kebutuhan bisnis yang sah, pertimbangkan untuk melakukan blocking terhadap IP dan Domain tersebut melalui firewall atau External Dynamic List (EDL).
+• Apabila tidak terdapat kebutuhan bisnis yang sah, pertimbangkan untuk melakukan blocking terhadap IP tersebut melalui firewall atau External Dynamic List (EDL).
 • Terapkan policy deny untuk IP dengan reputasi buruk.
 
 Terimakasih,
