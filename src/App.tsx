@@ -43,7 +43,57 @@ import AalPivotVisualizer from './components/AalPivotVisualizer';
 import { MedikaPivotVisualizer } from './components/MedikaPivotVisualizer';
 import RepositoryTab from './components/RepositoryTab';
 
-export const downloadSingleFile = (fileObj: { name: string; content?: string; base64?: string; type?: string }) => {
+async function extractOffensesFromXml(file: File): Promise<any[]> {
+  const text = await file.text();
+  try {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, 'text/xml');
+    const parserError = xmlDoc.getElementsByTagName('parsererror');
+    if (parserError.length === 0) {
+      const nodes = xmlDoc.getElementsByTagName('OffenseForm');
+      if (nodes.length > 0) {
+        const tags = [
+          "id", "magnitude", "closeUser", "formattedClosedDate", "localizedCloseReason",
+          "deviceOrderBy", "escapedFormattedOffenseSource", "formattedOffenseType",
+          "description", "severity", "eventCount", "eventDescription", "startTime", "endTime",
+          "attacker", "target", "deviceCount", "targetNetwork", "attackerNetwork", "usernameOrderBy"
+        ];
+        const rows: any[] = [];
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i];
+          const row: Record<string, string> = {};
+          for (const tag of tags) {
+            const el = node.getElementsByTagName(tag)[0];
+            row[tag] = el ? (el.textContent || '').trim() : '';
+          }
+          rows.push(row);
+        }
+        return rows;
+      }
+    }
+  } catch (err) {
+    console.warn('DOMParser failed, falling back to regex:', err);
+  }
+
+  // Regex fallback
+  const offenseBlocks = text.match(/<OffenseForm[\s\S]*?<\/OffenseForm>/gi) || [];
+  const tags = [
+    "id", "magnitude", "closeUser", "formattedClosedDate", "localizedCloseReason",
+    "deviceOrderBy", "escapedFormattedOffenseSource", "formattedOffenseType",
+    "description", "severity", "eventCount", "eventDescription", "startTime", "endTime",
+    "attacker", "target", "deviceCount", "targetNetwork", "attackerNetwork", "usernameOrderBy"
+  ];
+  return offenseBlocks.map(block => {
+    const row: Record<string, string> = {};
+    for (const tag of tags) {
+      const m = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i').exec(block);
+      row[tag] = m ? m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1').trim() : '';
+    }
+    return row;
+  });
+}
+
+export const downloadSingleFile = (fileObj: { name: string; content?: string; base64?: string; type?: string; downloadUrl?: string }) => {
   let blob: Blob;
   if (fileObj.base64) {
     const binaryString = window.atob(fileObj.base64);
@@ -56,8 +106,13 @@ export const downloadSingleFile = (fileObj: { name: string; content?: string; ba
       ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       : 'text/plain;charset=utf-8';
     blob = new Blob([bytes], { type: mimeType });
-  } else {
+  } else if (fileObj.content) {
     blob = new Blob([fileObj.content || ''], { type: 'text/plain;charset=utf-8' });
+  } else if (fileObj.downloadUrl) {
+    window.location.href = fileObj.downloadUrl;
+    return;
+  } else {
+    return;
   }
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -276,7 +331,23 @@ function ProcessorTab({ instansiList, onProcessComplete }: { instansiList: strin
     formData.append('shift', shift);
     formData.append('simpan_selama', simpanSelama);
     if (file) {
-      formData.append('file', file);
+      const isXml = file.name.toLowerCase().endsWith('.xml');
+      if (isXml) {
+        try {
+          const offenses = await extractOffensesFromXml(file);
+          if (offenses && offenses.length > 0) {
+            formData.append('xml_data', JSON.stringify(offenses));
+            formData.append('xml_filename', file.name);
+          } else {
+            formData.append('file', file);
+          }
+        } catch (err) {
+          console.warn('Client XML extraction fallback to file upload:', err);
+          formData.append('file', file);
+        }
+      } else {
+        formData.append('file', file);
+      }
     }
     if (pasteText.trim()) {
       formData.append('paste_text', pasteText);
@@ -290,16 +361,33 @@ function ProcessorTab({ instansiList, onProcessComplete }: { instansiList: strin
         method: 'POST',
         body: formData,
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        let errMsg = `Server error ${res.status}: ${res.statusText}`;
+        if (res.status === 413 || text.includes('Request Entity Too Large') || text.includes('Payload Too Large')) {
+          errMsg = 'Ukuran file/data terlalu besar (melebihi batas 4.5 MB pada Vercel). Hapus teks di textarea jika sudah upload file XML, atau kompres/filter baris log.';
+        } else if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            errMsg = parsed.message || parsed.error || errMsg;
+          } catch {
+            errMsg = text.slice(0, 300);
+          }
+        }
+        throw new Error(errMsg);
+      }
+
       const data = await res.json();
       setResult(data);
       onProcessComplete(); // Refresh template list in case of updates
     } catch (e: any) {
       setResult({
         success: false,
-        message: `Terjadi kesalahan koneksi: ${e.message}`,
+        message: `${e.message}`,
         instansi,
         shift,
-        processLog: [`💥 Connection failed: ${e.message}`],
+        processLog: [`💥 Connection/Processing Error: ${e.message}`],
         resultFiles: []
       });
     } finally {
@@ -445,6 +533,11 @@ function ProcessorTab({ instansiList, onProcessComplete }: { instansiList: strin
                   <p className="text-[9px] text-slate-500 mt-0.5">
                     {(file.size / 1024 / 1024).toFixed(2)} MB • {file.name.split('.').pop()?.toUpperCase()} File
                   </p>
+                  {file.name.toLowerCase().endsWith('.xml') && (
+                    <p className="text-[9px] text-emerald-400 font-medium mt-0.5">
+                      ⚡ Teroptimasi otomatis (Dapat diproses bersamaan dengan paste .txt)
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"

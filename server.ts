@@ -546,7 +546,15 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   }
 });
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fieldSize: 100 * 1024 * 1024, // 100MB max field value size
+    fileSize: 100 * 1024 * 1024,  // 100MB max file upload size
+    fields: 100,
+    files: 10
+  }
+});
 
 // Constants and Mappings
 const SHIFTS: Record<string, [string, string]> = {
@@ -893,6 +901,8 @@ function applyHeuristicCorrections(eventData: any, rawLine: string, instansi: st
              l === 'private to public';
     });
 
+    const isAsei = instansi.toLowerCase() === 'asei';
+
     if (flowIdx !== -1) {
       corrected.traffic_flow = parts[flowIdx];
       corrected.src_ip = verticalize(parts[flowIdx + 1]);
@@ -902,18 +912,30 @@ function applyHeuristicCorrections(eventData: any, rawLine: string, instansi: st
       const rawHosts = (parts[flowIdx + 5] || '').split(/\r?\n/).map(s => s.trim().replace(/^"|"$/g, '')).filter(s => s.length > 0);
       
       if (rawDstIps.length > 0 && rawHosts.length > 0) {
-        const formattedDstIps = rawDstIps.map((ip, i) => {
-          let host = rawHosts[i] !== undefined ? rawHosts[i] : (rawHosts[0] || '');
-          if (host) {
-            if (!host.startsWith('(')) host = `(${host}`;
-            if (!host.endsWith(')')) host = `${host})`;
-            return `${ip} ${host}`;
-          }
-          return ip;
-        });
-        corrected.dst_ip = formattedDstIps.join('\n');
+        if (isAsei) {
+          let host = rawHosts[0] || 'Internal';
+          if (!host.startsWith('(')) host = `(${host}`;
+          if (!host.endsWith(')')) host = `${host})`;
+          corrected.dst_ip = [...rawDstIps, host].join('\n');
+        } else {
+          const formattedDstIps = rawDstIps.map((ip, i) => {
+            let host = rawHosts[i] !== undefined ? rawHosts[i] : (rawHosts[0] || '');
+            if (host) {
+              if (!host.startsWith('(')) host = `(${host}`;
+              if (!host.endsWith(')')) host = `${host})`;
+              return `${ip} ${host}`;
+            }
+            return ip;
+          });
+          corrected.dst_ip = formattedDstIps.join('\n');
+        }
       } else {
-        corrected.dst_ip = verticalize(parts[flowIdx + 3]);
+        const vert = verticalize(parts[flowIdx + 3]);
+        if (isAsei && parts[flowIdx + 5] && parts[flowIdx + 5].toLowerCase().includes('internal')) {
+          corrected.dst_ip = `${vert}\n(Internal)`;
+        } else {
+          corrected.dst_ip = vert;
+        }
       }
 
       corrected.dst_port = verticalize(parts[flowIdx + 4]);
@@ -940,23 +962,42 @@ function applyHeuristicCorrections(eventData: any, rawLine: string, instansi: st
       const rawHosts = (parts[24] || '').split(/\r?\n/).map(s => s.trim().replace(/^"|"$/g, '')).filter(s => s.length > 0);
 
       if (rawDstIps.length > 0 && rawHosts.length > 0) {
-        const formattedDstIps = rawDstIps.map((ip, i) => {
-          let host = rawHosts[i] !== undefined ? rawHosts[i] : (rawHosts[0] || '');
-          if (host) {
-            if (!host.startsWith('(')) host = `(${host}`;
-            if (!host.endsWith(')')) host = `${host})`;
-            return `${ip} ${host}`;
-          }
-          return ip;
-        });
-        corrected.dst_ip = formattedDstIps.join('\n');
+        if (isAsei) {
+          let host = rawHosts[0] || 'Internal';
+          if (!host.startsWith('(')) host = `(${host}`;
+          if (!host.endsWith(')')) host = `${host})`;
+          corrected.dst_ip = [...rawDstIps, host].join('\n');
+        } else {
+          const formattedDstIps = rawDstIps.map((ip, i) => {
+            let host = rawHosts[i] !== undefined ? rawHosts[i] : (rawHosts[0] || '');
+            if (host) {
+              if (!host.startsWith('(')) host = `(${host}`;
+              if (!host.endsWith(')')) host = `${host})`;
+              return `${ip} ${host}`;
+            }
+            return ip;
+          });
+          corrected.dst_ip = formattedDstIps.join('\n');
+        }
       } else {
-        corrected.dst_ip = verticalize(parts[22]);
+        const vert = verticalize(parts[22]);
+        if (isAsei && parts[24] && parts[24].toLowerCase().includes('internal')) {
+          corrected.dst_ip = `${vert}\n(Internal)`;
+        } else {
+          corrected.dst_ip = vert;
+        }
       }
 
       corrected.dst_port = verticalize(parts[23]);
       corrected.dst_country = parts[24] || '-';
       corrected.dst_desc = parts[24] || '-';
+    }
+
+    if (isAsei && corrected.dst_ip && corrected.dst_ip.includes('(Internal)')) {
+      const lines = corrected.dst_ip.split('\n').map((l: string) => l.replace(/\s*\(Internal\)/gi, '').trim()).filter((l: string) => l.length > 0);
+      if (lines.length > 0) {
+        corrected.dst_ip = [...lines, '(Internal)'].join('\n');
+      }
     }
 
     // Preserve specific alert name in event_name before event_type is overwritten
@@ -2703,18 +2744,20 @@ app.post('/api/process', upload.any(), async (req, res, next) => {
 
     instansi = req.body?.instansi || '';
     shift = req.body.shift || '';
-    const { paste_text } = req.body;
+    const { paste_text, xml_data, xml_filename } = req.body;
 
     if (!instansi || !shift) {
       return res.status(400).json({ error: 'Instansi and shift are required' });
     }
-    if (!file && !paste_text && !imageFile) {
+    if (!file && !paste_text && !imageFile && !xml_data) {
       return res.status(400).json({ error: 'Log or XML file must be uploaded or log text must be pasted' });
     }
 
     processLog.push(`🏢 Instansi dipilih: ${instansi.toUpperCase()}`);
     processLog.push(`🕐 Shift: ${shift}`);
-    if (file) {
+    if (xml_data) {
+      processLog.push(`📥 Data XML diterima (Optimized Upload): ${xml_filename || 'data_export.xml'}`);
+    } else if (file) {
       processLog.push(`📥 File diterima: ${file.originalname}`);
     } else if (paste_text) {
       processLog.push(`📥 Teks log langsung diterima (Pasted Text)`);
@@ -2723,7 +2766,7 @@ app.post('/api/process', upload.any(), async (req, res, next) => {
       processLog.push(`🖼️ Screenshot Dashboard SIEM diterima: ${imageFile.originalname}`);
     }
 
-    const fileExt = file ? file.originalname.split('.').pop()?.toLowerCase() : 'txt';
+    const fileExt = file ? file.originalname.split('.').pop()?.toLowerCase() : (xml_data ? 'xml' : 'txt');
 
     const baseDb = path.join(getDatabaseDir(), instansi);
     const magMap = loadEventMagnitudes(path.join(baseDb, 'events_magnitude_list.csv'));
@@ -2989,7 +3032,7 @@ Regards, SOC Neotech`;
 
     const isTxtFile = Boolean(file && (fileExt === 'txt' || file.originalname.toLowerCase().endsWith('.txt')));
     const hasTextContent = Boolean(isTxtFile || (paste_text && paste_text.trim().length > 0));
-    const hasXmlFile = Boolean(file && (fileExt === 'xml' || file.originalname.toLowerCase().endsWith('.xml')));
+    const hasXmlFile = Boolean((file && (fileExt === 'xml' || file.originalname.toLowerCase().endsWith('.xml'))) || (xml_data && xml_data.trim().length > 0));
 
     if (hasTextContent) {
       if (instansi.toLowerCase() === 'sophos') {
@@ -3452,19 +3495,31 @@ SOC Neotech`;
     }
 
     if (hasXmlFile) {
-      const content = fs.readFileSync(file.path, 'utf-8');
-      const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: true });
-      const result = await parser.parseStringPromise(content);
-
       let offensesList: any[] = [];
-      if (result && result.OffenseForm) {
-        offensesList = Array.isArray(result.OffenseForm) ? result.OffenseForm : [result.OffenseForm];
-      } else if (result && result.offenses && result.offenses.OffenseForm) {
-        offensesList = Array.isArray(result.offenses.OffenseForm) ? result.offenses.OffenseForm : [result.offenses.OffenseForm];
-      } else {
-        const rootKey = Object.keys(result)[0];
-        if (rootKey && result[rootKey] && result[rootKey].OffenseForm) {
-          offensesList = Array.isArray(result[rootKey].OffenseForm) ? result[rootKey].OffenseForm : [result[rootKey].OffenseForm];
+
+      if (xml_data && xml_data.trim().length > 0) {
+        try {
+          const parsed = typeof xml_data === 'string' ? JSON.parse(xml_data) : xml_data;
+          offensesList = Array.isArray(parsed) ? parsed : (parsed.OffenseForm ? (Array.isArray(parsed.OffenseForm) ? parsed.OffenseForm : [parsed.OffenseForm]) : []);
+        } catch (err) {
+          console.error('Failed to parse xml_data JSON:', err);
+        }
+      }
+
+      if (offensesList.length === 0 && file) {
+        const content = fs.readFileSync(file.path, 'utf-8');
+        const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: true });
+        const result = await parser.parseStringPromise(content);
+
+        if (result && result.OffenseForm) {
+          offensesList = Array.isArray(result.OffenseForm) ? result.OffenseForm : [result.OffenseForm];
+        } else if (result && result.offenses && result.offenses.OffenseForm) {
+          offensesList = Array.isArray(result.offenses.OffenseForm) ? result.offenses.OffenseForm : [result.offenses.OffenseForm];
+        } else {
+          const rootKey = Object.keys(result)[0];
+          if (rootKey && result[rootKey] && result[rootKey].OffenseForm) {
+            offensesList = Array.isArray(result[rootKey].OffenseForm) ? result[rootKey].OffenseForm : [result[rootKey].OffenseForm];
+          }
         }
       }
 
@@ -3505,7 +3560,7 @@ SOC Neotech`;
         processLog.push(`🧹 [KEMKES] Menyaring data: Menghapus baris dengan Severity = 0 atau Attacker di 192.168.*, 172.31.*, 10.100.*, 10.255.*, 0.0.0.0 (Sisa ${rows.length} dari ${initialCount} baris).`);
       }
 
-      const baseNameNoExt = file ? path.basename(file.path, '.xml') : 'pasted_xml';
+      const baseNameNoExt = xml_filename ? path.basename(xml_filename, '.xml') : (file ? path.basename(file.path, '.xml') : 'pasted_xml');
       const dateMatch = /(\d{4})-(\d{2})-(\d{2})/.exec(baseNameNoExt);
       let tanggalFile = "UnknownDate";
       if (dateMatch) {
@@ -3532,11 +3587,15 @@ SOC Neotech`;
       XLSX.utils.book_append_sheet(workbook, worksheet, "Offenses");
       XLSX.writeFile(workbook, excelFilePath);
 
+      const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+      const excelBase64 = excelBuffer ? excelBuffer.toString('base64') : '';
+
       resultFiles.push({
         name: excelFileName,
         path: excelFilePath,
         downloadUrl: `/api/download?path=${encodeURIComponent(excelFilePath)}`,
-        type: 'excel'
+        type: 'excel',
+        base64: excelBase64
       });
 
       processLog.push(`📊 XML successfully converted to Excel: ${excelFileName}`);
