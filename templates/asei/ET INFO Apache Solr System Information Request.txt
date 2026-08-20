@@ -1,0 +1,49 @@
+Dear Team ASEI,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+No Tiket : {ticket_id}
+Sec. Event : {event_type}
+Signature : {event_name}
+Log Source : Suricata
+Severity : {severity}
+Action : {action}
+Waktu Deteksi : {tanggal} {waktu}
+
+===============================
+
+Deskripsi Event :
+Tim SOC mendeteksi adanya percobaan komunikasi anomali yang terjadi pada:
+
+Source IP :
+{src_ip}
+
+Source IP Country :
+{src_country}
+
+Destination IP :
+{dst_ip}
+
+Destination Port :
+{dst_port}
+
+===============================
+
+Terdeteksi adanya permintaan HTTP menuju endpoint /solr/admin/info/system pada server  yang merupakan endpoint administrasi Apache Solr. Request ini mengindikasikan aktivitas reconnaissance (pemindaian) untuk mengidentifikasi keberadaan dan memperoleh informasi sistem Apache Solr.
+
+===============================
+
+Mitigasi :
+
+- Verifikasi apakah server memang menjalankan layanan Apache Solr.
+- Pastikan endpoint administrasi Apache Solr (/solr/admin/*) tidak dapat diakses dari jaringan publik apabila tidak diperlukan.
+- Aktifkan autentikasi dan otorisasi pada Apache Solr Admin API.
+- Perbarui Apache Solr ke versi terbaru yang telah mendapatkan patch keamanan.
+
+
+===============================
+
+Terimakasih,
+SOC Neotech
