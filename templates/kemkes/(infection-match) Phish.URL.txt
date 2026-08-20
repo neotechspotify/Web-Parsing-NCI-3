@@ -1,0 +1,59 @@
+Dear Team KEMKES,
+
+Berikut kami informasikan terdapat ticket yang sudah kami buat mohon untuk dilakukan pengecekan dan dilakukan tindakan terhadap mitigasi yang sudah kami sampaikan ditiket tersebut:
+
+===============================
+
+Sec. Event : {event_name}<br>
+Category : {severity}<br>
+Magnitude : {sev_magnitude}<br>
+Action : Closed<br>
+Waktu Deteksi : {tanggal} {waktu}<br>
+
+===============================
+
+Deskripsi Event :<br>
+Tim SOC mendeteksi adanya komunikasi anomali yang terjadi pada<br>
+
+Source IP :<br>
+{src_ip}	 
+
+Source Country :<br>
+{src_country} 
+
+Destination IP :<br>
+{dst_ip}
+
+Destination Port:<br>
+{dst_port} 
+
+Destination Country :<br>
+{dst_country}
+
+Query :<br>
+{query}
+
+URL/DNS :<br>
+{url}
+
+===============================
+
+Event ini terjadi karena perangkat keamanan Trellix MPS mendeteksi adanya HTTP request menuju path {request} pada server {url}. Request tersebut mengarah ke file PHP yang berada pada struktur library/dependency aplikasi dan dapat mengindikasikan aktivitas reconnaissance atau probing terhadap file yang berpotensi memiliki kerentanan atau tidak seharusnya dapat diakses secara langsung.
+
+Berdasarkan log yang tersedia, aktivitas tersebut terdeteksi dengan signature Phish.URL dan belum menunjukkan adanya bukti keberhasilan eksploitasi. Namun, perlu dilakukan pengecekan lebih lanjut terhadap web server untuk memastikan apakah request tersebut berhasil diakses dan tidak terdapat aktivitas lanjutan seperti eksploitasi atau eksekusi file berbahaya.
+
+===============================
+
+Mitigasi :<br>
+- Verifikasi apakah source IP {src_ip} memiliki kebutuhan akses yang legitimate terhadap server {dst_ip}.
+- Periksa access log/web server untuk memastikan apakah request menuju {request} berhasil diakses atau menghasilkan response yang mencurigakan.
+- Verifikasi keberadaan file tersebut pada server dan pastikan file PHP pada direktori library/dependency tidak dapat diakses secara langsung apabila tidak diperlukan.
+- Lakukan pengecekan terhadap file atau direktori terkait untuk memastikan tidak terdapat file yang telah dimodifikasi, ditambahkan, atau mengandung malicious code.
+- Korelasikan dengan log WAF, firewall, dan endpoint untuk memastikan tidak terdapat aktivitas eksploitasi atau request mencurigakan lainnya dari source IP tersebut.
+- Apabila source IP tidak memiliki kebutuhan bisnis yang sah dan terindikasi melakukan scanning atau probing berulang, lakukan blocking terhadap IP tersebut melalui firewall/WAF.
+- Monitor aktivitas lanjutan terhadap server tujuan untuk memastikan tidak terdapat indikasi kompromi atau eksploitasi
+
+===============================
+
+Terimakasih,<br>
+SOC Neotech
